@@ -1,0 +1,19 @@
+class StatusLake:
+    CANCELED = "CANCELED"
+    DECOMPRESSING = "DECOMPRESSING"
+    DELETED = "DELETED"
+    FAILED = "FAILED"
+    FREE = "FREE"
+    INITIAL_LOAD = "INITIAL_LOAD"
+    INVALID_FILE = "INVALID_FILE"
+    LOST = "LOST"
+    STAGE = "STAGE"
+    PROCESSING = "PROCESSING"
+    RUNNING = "RUNNING"
+    SUCCEEDED = "SUCCEEDED"
+    STOPPED = "STOPPED"
+    TIMEOUT = "TIMEOUT"
+    WAITING = "WAITING"
+
+    def __init__(self):
+        pass

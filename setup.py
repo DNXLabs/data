@@ -3,6 +3,14 @@ import setuptools
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
+
+install_requires = [
+    'boto3==1.14.7',
+    'awswrangler==1.5.0',
+    'pandas==1.0.5',
+    'python-dateutil==2.8.1'
+]
+
 setuptools.setup(
     name="dnx-data", # Replace with your own username
     version="0.1.0",
