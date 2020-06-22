@@ -12,19 +12,19 @@ install_requires = [
 ]
 
 setuptools.setup(
-    name="dnx-data", # Replace with your own username
-    version="0.1.0",
-    author="DNX Solutions",
-    author_email="contact@dnx.solutions",
-    description="DNX data solution package",
+    name='dnx-data', # Replace with your own username
+    version='0.1.0',
+    author='DNX Solutions',
+    author_email='contact@dnx.solutions',
+    description='DNX data solution package',
     long_description=long_description,
-    long_description_content_type="text/markdown",
-    url="https://github.com/DNXLabs/dnx-data",
+    long_description_content_type='text/markdown',
+    url='https://github.com/DNXLabs/dnx-data',
     packages=setuptools.find_packages(),
     classifiers=[
-        "Programming Language :: Python :: 3",
-        "License :: OSI Approved :: Apache License",
-        "Operating System :: OS Independent",
+        'Programming Language :: Python :: 3',
+        'License :: OSI Approved :: Apache Software License',
+        'Operating System :: OS Independent',
     ],
     python_requires='>=3.6',
 )
