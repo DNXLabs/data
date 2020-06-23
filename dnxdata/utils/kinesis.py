@@ -1,6 +1,6 @@
 import boto3
 import uuid
-from src.lib.logger import info, debug, error
+from dnxdata.logger import info, debug, error
 
 
 class Kinesis:

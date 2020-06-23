@@ -1,6 +1,6 @@
 import dateutil.tz
 from datetime import datetime
-from src.lib.logger import debug
+from dnxdata.logger import debug
 
 
 class Utils:

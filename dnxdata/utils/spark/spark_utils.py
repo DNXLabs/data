@@ -2,8 +2,8 @@ import sys
 from pyspark.sql.functions import lit
 from pyspark.sql.functions import (when, col, trim)
 from pyspark.sql import functions as F
-from src.lib.utils.utils import Utils
-from src.lib.utils.boto3 import Boto3
+from dnxdata.utils.utils import Utils
+from dnxdata.utils.boto3 import Boto3
 
 
 class SparkUtils:

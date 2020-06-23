@@ -1,8 +1,8 @@
 import time
 from boto3.dynamodb.conditions import Key
-from src.lib.utils.utils import Utils
-from src.lib.resource import dynamo_resource
-from src.lib.logger import info, debug, error
+from dnxdata.utils.utils import Utils
+from dnxdata.resource import dynamo_resource
+from dnxdata.logger import info, debug, error
 
 
 class Dynamo:

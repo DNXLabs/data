@@ -1,5 +1,5 @@
 import pymysql
-from src.lib.logger import info
+from dnxdata.logger import info
 
 
 class Mysql:

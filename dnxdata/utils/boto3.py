@@ -2,9 +2,9 @@ import gzip
 import logging
 import boto3
 import time
-from src.lib.utils.utils import Utils
-from src.lib.logger import info, error
-from src.lib.resource import s3_client, s3_resource
+from dnxdata.utils.utils import Utils
+from dnxdata.logger import info, error
+from dnxdata.resource import s3_client, s3_resource
 from io import BytesIO
 
 

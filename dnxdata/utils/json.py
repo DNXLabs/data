@@ -1,7 +1,7 @@
 import json
 
-from src.lib.logger import info, debug, error
-from src.lib.utils.boto3 import Boto3
+from dnxdata.logger import info, debug, error
+from dnxdata.utils.boto3 import Boto3
 
 
 class Json:

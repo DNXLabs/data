@@ -1,7 +1,7 @@
 import boto3
-from src.lib.utils.utils import Utils
-from src.lib.logger import info, error
-from src.lib.resource import glue_client
+from dnxdata.utils.utils import Utils
+from dnxdata.logger import info, error
+from dnxdata.resource import glue_client
 
 
 class Glue:

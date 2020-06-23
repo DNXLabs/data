@@ -1,5 +1,5 @@
-from src.lib.utils.boto3 import Boto3
-from src.lib.logger import info
+from dnxdata.utils.boto3 import Boto3
+from dnxdata.logger import info
 
 
 class Lambda:

@@ -1,6 +1,6 @@
-from src.lib.utils.utils import Utils
-from src.lib.utils.boto3 import Boto3
-from src.lib.logger import info, debug, error
+from dnxdata.utils.utils import Utils
+from dnxdata.utils.boto3 import Boto3
+from dnxdata.logger import info, debug, error
 import awswrangler as wr
 import pandas as pd
 
