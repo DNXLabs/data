@@ -20,10 +20,9 @@ source env/bin/activate
 deactivate
 ```
 
-#### Install dependencies
-
+#### Install and test module
 ```bash
-pip3 install -r requirements.txt
+#### Install dependencies and module
 pip3 install --editable .
 ```
 

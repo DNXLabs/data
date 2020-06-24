@@ -5,16 +5,12 @@ with open("README.md", "r") as fh:
 
 
 install_requires = [
-    'boto3==1.14.7',
-    'awswrangler==1.5.0',
-    'pandas==1.0.5',
-    'numpy==1.18.0',
     'python-dateutil==2.8.1'
 ]
 
 setuptools.setup(
     name='dnx-data', # Replace with your own username
-    version='0.1.3',
+    version='0.1.4',
     author='DNX Solutions',
     author_email='contact@dnx.solutions',
     description='DNX data solution package',
