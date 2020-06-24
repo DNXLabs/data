@@ -68,8 +68,9 @@ class Mysql:
             script=select
         )
 
-        # TODO Review logic
-        result = [x for x in result[0]]
+        result = []
+        for x in result[0]:
+            result.append(x)
 
         self.logger.debug("Result {}".format(result))
         self.logger.debug("Finishing get_primary_key")

@@ -117,13 +117,13 @@ class Json:
             exit(1)
 
         try:
-            config_default_aux = file_json["database"][database]["table"][table]
-            config_default.update(config_default_aux)
+            config_aux = file_json["database"][database]["table"][table]
+            config_default.update(config_aux)
             config_default.update({"database_rds": database})
 
             self.logger.debug(
                 "Config Table {}"
-                .format(config_default_aux)
+                .format(config_aux)
             )
         except Exception as e:
             self.logger.debug(

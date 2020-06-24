@@ -21,11 +21,11 @@ class Dynamo:
             )
         )
 
-        # TODO review logic
         if update:
             item_get = self.get_item_table(table=table, key=key)
             if len(item_get) != 0:
-                item_get.update({k: v for k, v in item.items()})
+                for key, value in item.items():
+                    item_get.update({key: value})
             else:
                 item_get = item
         else:
@@ -58,8 +58,12 @@ class Dynamo:
         )
         table_db = dynamo_resource.Table(table)
         response = table_db.get_item(Key=key)
-        # TODO Review logic
-        result = {k: v for k, v in response.get("Item").items() if k not in ['ResponseMetadata']} if response.get("Item") else {}
+
+        result = {}
+        if response.get("Item"):
+            for key, value in response.get("Item").items():
+                if key not in ['ResponseMetadata']:
+                    result.update({key: value})
 
         self.logger.debug("{}".format(result))
 
@@ -178,8 +182,10 @@ class Dynamo:
 
         if len(item) != 0:
             self.logger.info("MoveDataForOtherTable Line Log StageControl")
-            # TODO Review logic
-            item.update({k: v for k, v in list_update.items()})
+
+            for key, value in list_update.items():
+                item.update({key: value})
+
             response = self.put_table_item(
                 table=table_dest,
                 item=item,
