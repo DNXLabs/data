@@ -1,16 +1,18 @@
 
-CANCELED = "CANCELED"
-DECOMPRESSING = "DECOMPRESSING"
-DELETED = "DELETED"
-FAILED = "FAILED"
-FREE = "FREE"
-INITIAL_LOAD = "INITIAL_LOAD"
-INVALID_FILE = "INVALID_FILE"
-LOST = "LOST"
-STAGE = "STAGE"
-PROCESSING = "PROCESSING"
-RUNNING = "RUNNING"
-SUCCEEDED = "SUCCEEDED"
-STOPPED = "STOPPED"
-TIMEOUT = "TIMEOUT"
-WAITING = "WAITING"
+status_lake = {
+    "canceled": "CANCELED",
+    "decompressing": "DECOMPRESSING",
+    "deleted": "DELETED",
+    "failed": "FAILED",
+    "free": "FREE",
+    "initial_load": "INITIAL_LOAD",
+    "invalid_file": "INVALID_FILE",
+    "lost": "LOST",
+    "stage": "STAGE",
+    "processing": "PROCESSING",
+    "running": "RUNNING",
+    "succeeded": "SUCCEEDED",
+    "stopped": "STOPPED",
+    "timeout": "TIMEOUT",
+    "waiting": "WAITING",
+}

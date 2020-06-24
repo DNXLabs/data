@@ -35,7 +35,7 @@ class Dynamo:
         table_db = dynamo_resource.Table(table)
         response = table_db.put_item(Item=item_get)
 
-        debug(
+        self.logger.debug(
             "Finishing PutTableItem Table {} DynamoDB Response {}"
             .format(
                 table,
@@ -61,7 +61,7 @@ class Dynamo:
         # TODO Review logic
         result = {k: v for k, v in response.get("Item").items() if k not in ['ResponseMetadata']} if response.get("Item") else {}
 
-        debug("{}".format(result))
+        self.logger.debug("{}".format(result))
 
         self.logger.info("Finishing GetItemTable")
 
@@ -126,7 +126,7 @@ class Dynamo:
                 )
             )
         except Exception as e:
-            error(
+            self.logger.error(
                 "UpdateTableItem Table: {} Error: {}"
                 .format(
                     table,
@@ -266,14 +266,18 @@ class Dynamo:
                         break
 
         self.logger.info(
-            "self.logger.infoCount ScanTableAllPages {}"
-            .format(len(items))
+            "ScanTableAllPages {}"
+            .format(
+                len(items)
+            )
         )
-        debug(
-            "self.logger.infoItems Return ScanTableAllPages {}"
-            .format(items)
+        self.logger.debug(
+            "Items Return ScanTableAllPages {}"
+            .format(
+                items
+            )
         )
 
-        self.logger.info("self.logger.infoFinishing ScanTableAllPages")
+        self.logger.info("Finishing ScanTableAllPages")
 
         return items
