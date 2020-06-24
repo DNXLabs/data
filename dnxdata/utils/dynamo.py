@@ -2,16 +2,18 @@ import time
 from boto3.dynamodb.conditions import Key
 from dnxdata.utils.utils import Utils
 from dnxdata.resource import dynamo_resource
-from dnxdata.logger import info, debug, error
+from dnxdata.logger import Logger
 
 
 class Dynamo:
 
     def __init__(self):
         self.utils = Utils()
+        self.logger = Logger("DNX Dynamo => ")
 
     def put_table_item(self, table, item, key, update=True):
-        info(
+
+        self.logger.info(
             "Starting PutTableItem Table {} DynamoDB Item {}"
             .format(
                 table,
@@ -40,13 +42,14 @@ class Dynamo:
                 response
             )
         )
-        info("Finishing PutTableItem")
+
+        self.logger.info("Finishing PutTableItem")
 
         return response
 
     def get_item_table(self, table, key):
 
-        info(
+        self.logger.info(
             "Starting GetItemTable Table {} DynamoDB Key {}"
             .format(
                 table,
@@ -59,12 +62,14 @@ class Dynamo:
         result = {k: v for k, v in response.get("Item").items() if k not in ['ResponseMetadata']} if response.get("Item") else {}
 
         debug("{}".format(result))
-        info("Finishing GetItemTable")
+
+        self.logger.info("Finishing GetItemTable")
 
         return result
 
     def delete_table_item(self, table, key):
-        info(
+
+        self.logger.info(
             "Starting DeleteTableItem Table {} DynamoDB Key {}"
             .format(
                 table,
@@ -75,15 +80,15 @@ class Dynamo:
         response = table_db.delete_item(Key=key)
 
         if response["ResponseMetadata"]["HTTPStatusCode"] == 200:
-            info("Successful deletion")
+            self.logger.info("Successful deletion")
             time.sleep(1)
             item = self.get_item_table(table=table, key=key)
             if len(item) > 1:
-                info("Double check exclusion table")
+                self.logger.info("Double check exclusion table")
                 time.sleep(1)
                 response = table_db.delete_item(Key=key)
 
-        info(
+        self.logger.info(
             "Finishing DeleteTableItem Table {} DynamoDB Response {}"
             .format(
                 table,
@@ -94,8 +99,9 @@ class Dynamo:
         return response
 
     def update_table_item(self, table, key, updateExpression, expressionAttributeValues):
+
         try:
-            info(
+            self.logger.info(
                 "Starting UpdateTableItem Table {} DynamoDB, Key {}, updateExpression {}, expressionAttributeValues {}"
                 .format(
                     table,
@@ -112,7 +118,7 @@ class Dynamo:
                 ExpressionAttributeValues=updateExpression,
                 ReturnValues="UPDATED_NEW"
             )
-            info(
+            self.logger.info(
                 "Finishing UpdateTableItem Table {} DynamoDB Response {}"
                 .format(
                     table,
@@ -131,8 +137,9 @@ class Dynamo:
         return response
 
     def get_data_dynamo_index(self, table, index_name, key, value):
-        info(
-            "Starting GetDataStageDynamoDb Table {} DynamoDB, IndexName {}, Key {}, Value {}"
+
+        self.logger.info(
+            "Starting GetDataIndex Table {} DynamoDB, IndexName {}, Key {}, Value {}"
             .format(
                 table,
                 index_name,
@@ -145,8 +152,9 @@ class Dynamo:
             IndexName=index_name,
             KeyConditionExpression=Key(key).eq(value))
         response = response['Items']
-        info(
-            "Finishing GetDataStageDynamoDb table {} DynamoDB Response {}"
+
+        self.logger.info(
+            "Finishing GetDataIndex table {} DynamoDB Response {}"
             .format(
                 table,
                 response
@@ -156,7 +164,8 @@ class Dynamo:
         return response
 
     def move_data_for_another_table(self, key, list_update, table_ori, table_dest, delete_ori=True):
-        info(
+
+        self.logger.info(
             "Starting MoveDataForOtherTable Key {}, listUpdate {}, tableOri {},tableDest {}"
             .format(
                 key,
@@ -168,7 +177,7 @@ class Dynamo:
         item = self.get_item_table(table=table_ori, key=key)
 
         if len(item) != 0:
-            info("MoveDataForOtherTable Line Log StageControl")
+            self.logger.info("MoveDataForOtherTable Line Log StageControl")
             # TODO Review logic
             item.update({k: v for k, v in list_update.items()})
             response = self.put_table_item(
@@ -177,7 +186,7 @@ class Dynamo:
                 key=key,
                 update=False
             )
-            info(
+            self.logger.info(
                 "MoveDataForOtherTable Response PutTableItem {}"
                 .format(
                     response
@@ -190,26 +199,27 @@ class Dynamo:
                     table=table_ori,
                     key=key
                 )
-                info(
+                self.logger.info(
                     "MoveDataForOtherTable Response DeleteTableItem {}"
                     .format(
                         response
                     )
                 )
             else:
-                info(
-                    "infodelete_ori {} "
+                self.logger.info(
+                    "self.logger.infodelete_ori {} "
                     .format(delete_ori))
-                info(
+                self.logger.info(
                     "MoveDataForOtherTable Invalid Response"
                 )
         else:
-            info("MoveDataForOtherTable Invalid GetItemTable")
+            self.logger.info("MoveDataForOtherTable Invalid GetItemTable")
 
-        info("Finishing MoveDataForOtherTable")
+        self.logger.info("Finishing MoveDataForOtherTable")
 
     def scan_table_all_pages(self, table, filter_key=None, filter_value=None):
-        info(
+
+        self.logger.info(
             "Starting ScanTableAllPages Table {},filter_key {},filter_value {}"
             .format(
                 table,
@@ -223,7 +233,7 @@ class Dynamo:
 
         if filter_key and filter_value:
             if not isinstance(filter_value, list):
-                info(
+                self.logger.info(
                     "ScanTableAllPages Parameter invalid {}, required list []"
                     .format(filter_value))
                 filter_value = filter_value.split(",")
@@ -255,15 +265,15 @@ class Dynamo:
                     else:
                         break
 
-        info(
-            "infoCount ScanTableAllPages {}"
+        self.logger.info(
+            "self.logger.infoCount ScanTableAllPages {}"
             .format(len(items))
         )
         debug(
-            "infoItems Return ScanTableAllPages {}"
+            "self.logger.infoItems Return ScanTableAllPages {}"
             .format(items)
         )
 
-        info("infoFinishing ScanTableAllPages")
+        self.logger.info("self.logger.infoFinishing ScanTableAllPages")
 
         return items

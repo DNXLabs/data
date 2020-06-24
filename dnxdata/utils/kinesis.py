@@ -1,6 +1,6 @@
 import boto3
 import uuid
-from dnxdata.logger import info, debug, error
+from dnxdata.logger import Logger
 
 
 class Kinesis:
@@ -8,10 +8,17 @@ class Kinesis:
     def __init__(self, name, region):
         self.name = name
         self.region = region
+        self.logger = Logger("DNX Kinesis => ")
 
     def conn(self):
 
-        info("Starting Conn Kinesis name {}, region {}".format(self.name, self.region))
+        self.logger.info(
+            "Starting Conn Kinesis name {}, region {}"
+            .format(
+                self.name,
+                self.region
+            )
+        )
 
         if self.region and self.name:
 
@@ -21,20 +28,24 @@ class Kinesis:
             self.kinesis = {"client": self.client,
                             "stream": self.stream}
 
-            info("Finishing Conn Kinesis")
+            self.logger.info("Finishing Conn Kinesis")
             return self.kinesis
         else:
-            info("Invalid argument Conn Kinesis")
+            self.logger.info("Invalid argument Conn Kinesis")
             exit(1)
 
-    def send_data(self, data_binary_string, put_record="PRB", verbose=False):
+    def send_data(self, data_binary_string, put_record="PRB"):
 
-        if verbose:
-            info("Starting SendData Kinesis")
+        self.logger.debug("Starting SendData Kinesis")
 
         option = ["PR", "PRB"]
         if put_record not in option:
-            error("Put record not configure. Available {}".format(option))
+            self.logger.error(
+                "Put record not configure. Available {}"
+                .format(
+                    option
+                )
+            )
             exit(1)
 
         if put_record == "PR":
@@ -56,11 +67,15 @@ class Kinesis:
             )
 
         if response["ResponseMetadata"]["HTTPStatusCode"] == 200:
-            debug("SUCCESS, your request ID is : " + response["ResponseMetadata"]["RequestId"])
+            self.logger.debug(
+                "SUCCESS, your request ID is : {}"
+                .format(
+                    response["ResponseMetadata"]["RequestId"]
+                )
+            )
 
         else:
-            info("ERROR : something went wrong")
+            self.logger.error("ERROR : something went wrong")
             exit(1)
 
-        if verbose:
-            info("Finishing SendData Kinesis")
+        self.logger.debug("Finishing SendData Kinesis")

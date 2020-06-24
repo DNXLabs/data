@@ -1,9 +1,7 @@
 import gzip
-import logging
-import boto3
 import time
 from dnxdata.utils.utils import Utils
-from dnxdata.logger import info, error
+from dnxdata.logger import Logger
 from dnxdata.resource import s3_client, s3_resource
 from io import BytesIO
 
@@ -12,9 +10,10 @@ class Boto3:
 
     def __init__(self):
         self.utils = Utils()
+        self.logger = Logger("DNX Boto3 => ")
 
     def get_list_parquet(self, path):
-        info("Starting get_list_parquet")
+        self.logger.info("Starting get_list_parquet")
 
         keys_s3 = []
         list_path = []
@@ -44,16 +43,16 @@ class Boto3:
                 for parquet in parquets:
                     keys_s3.append(parquet)
             break
-        info("Finishing get_list_parquet")
+        self.logger.info("Finishing get_list_parquet")
         return keys_s3
 
     def put_object_s3(self, bucket, key, file):
 
-        info("Starting put_object_s3")
+        self.logger.info("Starting put_object_s3")
 
         gz_body = BytesIO()
         gz = gzip.GzipFile(None, 'wb', 9, gz_body)
-        gz.write(str(file).encode('utf-8'))  # convert unicode strings to bytes!
+        gz.write(str(file).encode('utf-8'))  # convert unicode strings to bytes
         gz.close()
         # GzipFile has written the compressed bytes into our gz_body
         s3_client.put_object(
@@ -64,11 +63,11 @@ class Boto3:
             Body=gz_body.getvalue()
         )
 
-        info("Finishing put_object_s3")
+        self.logger.info("Finishing put_object_s3")
 
     def get_object_s3(self, bucket, key, format_file=None):
 
-        info(
+        self.logger.info(
             "Starting GetObjectS3 format {} {}/{}"
             .format(
                 format_file,
@@ -87,18 +86,16 @@ class Boto3:
                     'rb',
                     fileobj=bytestream
                 ).read().decode('utf-8')
-                # uncompressed_payload = gzip.decompress(file)
-                # decoded = uncompressed_payload.decode('utf-8')
         else:
             file = file['Body'].read()
             decoded = file.decode('utf-8')
 
-        info("Finishing GetObjectS3")
+        self.logger.info("Finishing GetObjectS3")
 
         return decoded
 
     def move_file_s3(self, bucket_ori, key_ori, bucket_dest, key_dest):
-        info(
+        self.logger.info(
             "Starting MoveFileS3 Ori {}/{}  Dest {}/{}"
             .format(
                 bucket_ori,
@@ -109,22 +106,22 @@ class Boto3:
         )
 
         copy_source = {'Bucket': bucket_ori, 'Key': key_ori}
-        info("Starting Change Bucket")
+        self.logger.info("Starting Change Bucket")
         s3_client.copy_object(
             CopySource=copy_source,
             Bucket=bucket_dest.strip(),
             Key=key_dest.strip()
         )
-        info("Finishing Change Bucket")
+        self.logger.info("Finishing Change Bucket")
         time.sleep(3)
-        info("Starting Delete File")
+        self.logger.info("Starting Delete File")
         s3_client.delete_object(
             Bucket=bucket_ori.strip(),
             Key=key_ori.strip()
         )
-        info("Finishing Delete File")
+        self.logger.info("Finishing Delete File")
 
-        info("Finishing MoveFileS3")
+        self.logger.info("Finishing MoveFileS3")
 
     def _delete_key(self, bucket, key):
 
@@ -135,15 +132,18 @@ class Boto3:
                 s3_resource.Object(bucket, key).delete()
                 time.sleep(1)
             except Exception as e:
-                error(e)
+                self.logger.error(e)
                 pass
 
-    def delete_file_s3(self, path, path_or_key="key", verbose=True):
+    def delete_file_s3(self, path, path_or_key="key"):
 
-        if verbose:
-            info(
-                "Starting DeleteFileS3 path {} path_or_key {}"
-                .format(path, path_or_key))
+        self.logger.debug(
+            "Starting DeleteFileS3 path {} path_or_key {}"
+            .format(
+                path,
+                path_or_key
+            )
+        )
 
         while True:
 
@@ -151,8 +151,7 @@ class Boto3:
                 path = path.split(" ")
 
             if len(path) == 0:
-                if verbose:
-                    info("0 path for delete")
+                self.logger.debug("0 path for delete")
                 break
 
             bucket_aux = ""
@@ -164,23 +163,38 @@ class Boto3:
 
                 if path_or_key.lower() == "path":
                     for obj in bucket.objects.filter(Prefix=_key):
-                        if verbose:
-                            info("File deleted {}/{}".format(_bucket, obj.key))
+                        self.logger.debug(
+                            "File deleted {}/{}"
+                            .format(
+                                _bucket,
+                                obj.key
+                            )
+                        )
                         self._delete_key(bucket=_bucket, key=obj.key)
 
                 elif path_or_key.lower() == "key":
-                    if verbose:
-                        info("File deleted {}/{}".format(_bucket, _key))
+                    self.logger.debug(
+                        "File deleted {}/{}"
+                        .format(
+                            _bucket,
+                            _key
+                        )
+                    )
                     self._delete_key(bucket=_bucket, key=_key)
             break
 
-        if verbose:
-            info("Finishing DeleteFileS3")
+        self.logger.debug("Finishing DeleteFileS3")
 
-    def get_list_file(self, bucket, filepath, endswith, verbose=False):
+    def get_list_file(self, bucket, filepath, endswith):
 
-        if verbose:
-            info("Starting GetListFile {}/{}/*{}".format(bucket, filepath, endswith))
+        self.logger.debug(
+            "Starting GetListFile {}/{}/*{}"
+            .format(
+                bucket,
+                filepath,
+                endswith
+            )
+        )
 
         if not filepath.endswith('/'):
             filepath += '/'
@@ -193,17 +207,25 @@ class Boto3:
         """
         prefix = filepath[1:] if filepath.startswith("/") else filepath
         _bucket = s3_resource.Bucket(bucket)
-        keys_s3 = []
-        keys_s3 = ["s3://" + str(bucket) + "/" + _.key for _ in _bucket.objects.filter(Prefix=prefix) if _.key.endswith(endswith)]
 
-        if (len(keys_s3) == 0) & verbose:
-            info("No {} found in bucket {}/{}".format(endswith, bucket, filepath))
+        keys_s3 = []
+        for _ in _bucket.objects.filter(Prefix=prefix):
+            if _.key.endswith(endswith):
+                keys_s3.append(["s3://" + str(bucket) + "/" + _.key])
+
+        if (len(keys_s3) == 0):
+            self.logger.debug(
+                "No {} found in bucket {}/{}"
+                .format(
+                    endswith,
+                    bucket,
+                    filepath
+                )
+            )
         else:
             for p in keys_s3:
-                if verbose:
-                    info("S3Keys {}".format(p))
+                self.logger.debug("S3Keys {}".format(p))
 
-        if verbose:
-            info("Finishing GetListFile")
+        self.logger.debug("Finishing GetListFile")
 
         return keys_s3

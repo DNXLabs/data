@@ -2,3 +2,5 @@ env
 dist
 dnx_data.egg-info
 build
+__pycache__
+.vscode

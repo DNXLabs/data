@@ -1,26 +1,25 @@
-from dnxdata.utils.boto3 import Boto3
-from dnxdata.logger import info
+from dnxdata.resource import lambda_client
+from dnxdata.logger import Logger
 
 
 class Lambda:
 
     def __init__(self):
-        pass
+        self.logger = Logger("DNX Lambda => ")
 
     def invoke(self, name):
-        info("Starting Invoke Lambda")
-        s3 = Boto3()
-        response = s3.invoke_lambda.invoke(
+        self.logger.info("Starting Invoke Lambda")
+        response = lambda_client.invoke_lambda.invoke(
             FunctionName=name,
             InvocationType='Event'
         )
 
         if response.get("StatusCode") == 202:
-            info("Invoke Lambda Success")
+            self.logger.info("Invoke Lambda Success")
         else:
-            info(
+            self.logger.info(
                 "Failed Invoke Lambda {}"
                 .format(response)
             )
 
-        info("Finishing Invoke Lambda")
+        self.logger.info("Finishing Invoke Lambda")

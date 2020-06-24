@@ -1,12 +1,12 @@
 import dateutil.tz
 from datetime import datetime
-from dnxdata.logger import debug
+from dnxdata.logger import Logger
 
 
 class Utils:
 
     def __init__(self):
-        pass
+        self.logger = Logger("DNX Utils => ")
 
     def get_bucket_key(self, path):
         """
@@ -22,7 +22,7 @@ class Utils:
         key = "/".join(path.split("/")[1:-1])
 
         source = {"bucket": bucket.strip(), "key": key.strip()}
-        debug(
+        self.logger.debug(
             "Get Bucket key source {}"
             .format(source)
         )

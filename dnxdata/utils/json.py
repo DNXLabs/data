@@ -1,6 +1,5 @@
 import json
-
-from dnxdata.logger import info, debug, error
+from dnxdata.logger import Logger
 from dnxdata.utils.boto3 import Boto3
 
 
@@ -8,11 +7,18 @@ class Json:
 
     def __init__(self, bucket_stage_artifacts):
         self.bucket_stage_artifacts = bucket_stage_artifacts
+        self.logger = Logger("DNX Json => ")
 
     def load_json(self, key=None, value=None):
 
         try:
-            info("Starting LoadJson File Json Key {} Value {}".format(key, value))
+            self.logger.info(
+                "Starting LoadJson File Json Key {} Value {}"
+                .format(
+                    key,
+                    value
+                )
+            )
             bucket = self.bucket_stage_artifacts
             key_s3 = "json/param_lambda.json"
 
@@ -28,28 +34,41 @@ class Json:
             elif value is not None:
                 dict_load = dict_load[key][value]
 
-            info("Finishing LoadJson File Json")
-            print(dict_load)
+            self.logger.info("Finishing LoadJson File Json")
+            self.logger.debug(print(dict_load))
             return dict_load
 
         except Exception as e:
-            error(
+            self.logger.error(
                 "Error Load File Json: {} "
                 .format(e)
             )
 
     def valid_key(self, key, value=None, table=None):
 
-        info("Starting ValidKey Key {} Value {} Table {}".format(key, value, table))
+        self.logger.info(
+            "Starting ValidKey Key {} Value {} Table {}"
+            .format(
+                key,
+                value,
+                table
+            )
+        )
 
         dict_file = self.load_json(key=key, value=value)
 
-        v_boolean = True if (table.upper() in dict_file.keys()) | (table.lower() in dict_file.keys()) else False
+        equal_upper = table.upper() in dict_file.keys()
+        equal_lower = table.lower() in dict_file.keys()
+
+        if equal_upper or equal_lower:
+            v_boolean = True
+        else:
+            v_boolean = False
 
         if not v_boolean:
-            info("Non-parameterized File the Json")
+            self.logger.info("Non-parameterized File the Json")
 
-        info("Finishing ValidKey Key File Json")
+        self.logger.info("Finishing ValidKey Key File Json")
 
         return v_boolean
 
@@ -58,7 +77,12 @@ class Json:
         table = table.upper()
         database = database.lower()
 
-        info("Starting get_config Json Database {} Table {}".format(database, table))
+        self.logger.debug(
+            "Starting get_config Json Database {} Table {}".format(
+                database,
+                table
+            )
+        )
 
         config_default = {}
 
@@ -66,25 +90,30 @@ class Json:
 
         try:
             config_default = file_json["param"]
-            info("Config Param {}".format(config_default))
+            self.logger.debug("Config Param {}".format(config_default))
         except Exception as e:
-            error("Config Param not configured")
-            error(e)
+            self.logger.error("Config Param not configured")
+            self.logger.error(e)
             exit(1)
 
         try:
             config_default_aux = file_json["database"][database]["config"]
             config_default.update(config_default_aux)
-            info("Config Default Database {}".format(config_default_aux))
+            self.logger.debug(
+                "Config Default Database {}"
+                .format(
+                    config_default_aux
+                )
+            )
         except Exception as e:
-            error(
+            self.logger.error(
                 "Config Default not configured for the database {} table {}"
                 .format(
                     database,
                     table
                 )
             )
-            error(e)
+            self.logger.error(e)
             exit(1)
 
         try:
@@ -92,22 +121,19 @@ class Json:
             config_default.update(config_default_aux)
             config_default.update({"database_rds": database})
 
-            info(
-                "Config Default Table {}"
+            self.logger.debug(
+                "Config Table {}"
                 .format(config_default_aux)
             )
-            info(
-                "Complete config, default and exception {}"
-                .format(config_default)
-            )
         except Exception as e:
-            debug(
+            self.logger.debug(
                 "Error Return Config Default {}"
                 .format(str(e))
             )
+            exit(1)
 
-        info(
-            "Return Config {}"
+        self.logger.debug(
+            "Return config, default and exception {}"
             .format(config_default)
         )
 
