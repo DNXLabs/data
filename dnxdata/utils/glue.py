@@ -8,7 +8,7 @@ class Glue:
 
     def __init__(self):
         self.utils = Utils()
-        self.logger = Logger("DNX Glue => ")
+        self.logger = Logger("DNX Glue =>")
 
     def get_job_glue(self, job_name, job_run_id):
 

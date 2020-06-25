@@ -11,7 +11,7 @@ class Pandas:
         self.region = region
         self.utils = Utils()
         self.s3 = Boto3()
-        self.logger = Logger("DNX Pandas => ")
+        self.logger = Logger("DNX Pandas =>")
 
     # You can pass list or string path or .parquet
     def get_parquet(self, path):

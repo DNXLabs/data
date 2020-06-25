@@ -6,7 +6,7 @@ from dnxdata.logger import Logger
 class Utils:
 
     def __init__(self):
-        self.logger = Logger("DNX Utils => ")
+        self.logger = Logger("DNX Utils =>")
 
     def get_bucket_key(self, path):
         """

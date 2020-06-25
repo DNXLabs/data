@@ -10,7 +10,7 @@ class Boto3:
 
     def __init__(self):
         self.utils = Utils()
-        self.logger = Logger("DNX Boto3 => ")
+        self.logger = Logger("DNX Boto3 =>")
 
     def get_list_parquet(self, path):
         self.logger.info("Starting get_list_parquet")

@@ -5,7 +5,7 @@ from dnxdata.logger import Logger
 class Lambda:
 
     def __init__(self):
-        self.logger = Logger("DNX Lambda => ")
+        self.logger = Logger("DNX Lambda =>")
 
     def invoke(self, name, pay_load=None):
         self.logger.info("Starting Invoke Lambda")

@@ -8,7 +8,7 @@ class Kinesis:
     def __init__(self, name, region):
         self.name = name
         self.region = region
-        self.logger = Logger("DNX Kinesis => ")
+        self.logger = Logger("DNX Kinesis =>")
 
     def conn(self):
 

@@ -5,7 +5,7 @@ from dnxdata.logger import Logger
 class Mysql:
 
     def __init__(self):
-        self.logger = Logger("DNX Mysql => ")
+        self.logger = Logger("DNX Mysql =>")
 
     def execute(self, connection_settings, script):
 

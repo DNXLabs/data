@@ -9,7 +9,7 @@ class Dynamo:
 
     def __init__(self):
         self.utils = Utils()
-        self.logger = Logger("DNX Dynamo => ")
+        self.logger = Logger("DNX Dynamo =>")
 
     def put_table_item(self, table, item, key, update=True):
 

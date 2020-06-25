@@ -7,7 +7,7 @@ class Json:
 
     def __init__(self, bucket_stage_artifacts):
         self.bucket_stage_artifacts = bucket_stage_artifacts
-        self.logger = Logger("DNX Json => ")
+        self.logger = Logger("DNX Json =>")
 
     def load_json(self, key=None, value=None):
 
