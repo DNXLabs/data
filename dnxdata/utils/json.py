@@ -34,8 +34,9 @@ class Json:
             elif value is not None:
                 dict_load = dict_load[key][value]
 
+            self.logger.debug(dict_load)
             self.logger.info("Finishing LoadJson File Json")
-            self.logger.debug(print(dict_load))
+
             return dict_load
 
         except Exception as e:

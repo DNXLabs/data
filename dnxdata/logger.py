@@ -20,7 +20,7 @@ class Logger:
         self.logger.error(self.header + msg, *args, **kwargs)
 
     def warning(self, msg, *args, **kwargs):
-        self.logger.error(self.header + msg, *args, **kwargs)
+        self.logger.warning(self.header + msg, *args, **kwargs)
 
     def critical(self, msg, *args, **kwargs):
-        self.logger.error(self.header + msg, *args, **kwargs)
+        self.logger.critical(self.header + msg, *args, **kwargs)

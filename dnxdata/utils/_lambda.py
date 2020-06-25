@@ -7,11 +7,12 @@ class Lambda:
     def __init__(self):
         self.logger = Logger("DNX Lambda => ")
 
-    def invoke(self, name):
+    def invoke(self, name, pay_load=None):
         self.logger.info("Starting Invoke Lambda")
         response = lambda_client.invoke_lambda.invoke(
             FunctionName=name,
-            InvocationType='Event'
+            InvocationType='Event',
+            Payload=pay_load
         )
 
         if response.get("StatusCode") == 202:
