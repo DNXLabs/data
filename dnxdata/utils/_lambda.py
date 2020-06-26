@@ -1,5 +1,6 @@
 from dnxdata.resource import lambda_client
 from dnxdata.logger import Logger
+import json
 
 
 class Lambda:
@@ -9,10 +10,10 @@ class Lambda:
 
     def invoke(self, name, pay_load=None):
         self.logger.info("Starting Invoke Lambda")
-        response = lambda_client.invoke_lambda.invoke(
+        response = lambda_client.invoke(
             FunctionName=name,
             InvocationType='Event',
-            Payload=pay_load
+            Payload=json.dumps(pay_load)
         )
 
         if response.get("StatusCode") == 202:
