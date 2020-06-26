@@ -1,13 +1,14 @@
 import json
+import os
 from dnxdata.logger import Logger
-from dnxdata.utils.boto3 import Boto3
+from dnxdata.utils.dynamo import Dynamo
 
 
 class Json:
 
-    def __init__(self, bucket_stage_artifacts):
-        self.bucket_stage_artifacts = bucket_stage_artifacts
+    def __init__(self):
         self.logger = Logger("DNX Json =>")
+        self.dynamo = Dynamo()
 
     def load_json(self, key=None, value=None):
 
@@ -19,13 +20,13 @@ class Json:
                     value
                 )
             )
-            bucket = self.bucket_stage_artifacts
-            key_s3 = "json/param_lambda.json"
 
-            s3 = Boto3()
-            file_json = s3.get_object_s3(bucket, key_s3)
-            config_dict = json.loads(file_json)
-            dict_load = config_dict
+            param = self.dynamo.scan_table_all_pages(
+                            table=os.getenv('PARAM_TABLE')
+                        )
+            param = json.dumps(param)
+            param = json.loads(param)
+            dict_load = json.loads((param[0]["param"]))
 
             if key is None:
                 pass
