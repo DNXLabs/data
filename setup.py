@@ -11,7 +11,7 @@ install_requires = [
 
 setuptools.setup(
     name='dnx-data',  # Replace with your own username
-    version='0.2.1',
+    version='0.2.2',
     author='DNX Solutions',
     author_email='contact@dnx.solutions',
     description='DNX data solution package',
