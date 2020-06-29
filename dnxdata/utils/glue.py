@@ -12,7 +12,7 @@ class Glue:
 
     def get_job_glue(self, job_name, job_run_id):
 
-        self.logger.info(
+        self.logger.debug(
             "Starting _GetJobGlue job_name {},job_run_id {}"
             .format(
                 job_name,
@@ -22,7 +22,7 @@ class Glue:
 
         status = glue_client.get_job_run(JobName=job_name, RunId=job_run_id)
 
-        self.logger.info(
+        self.logger.debug(
             "Finishing _GetJobGlue status {}"
             .format(status)
         )
@@ -31,7 +31,7 @@ class Glue:
 
     def get_status_job_glue(self, job_name, job_run_id):
 
-        self.logger.info(
+        self.logger.debug(
             "Starting GetStatusJobGlue job_name {}, job_run_id {}"
             .format(
                 job_name,
@@ -41,7 +41,7 @@ class Glue:
         status = self.get_job_glue(job_name=job_name, job_run_id=job_run_id)
         state = status['JobRun']['JobRunState']
 
-        self.logger.info(
+        self.logger.debug(
             "Finishing GetStatusJobGlue Status {}"
             .format(state)
         )
@@ -50,7 +50,7 @@ class Glue:
 
     def get_msg_error_job_glue(self, job_name, job_run_id):
 
-        self.logger.info(
+        self.logger.debug(
             "Starting GetMsgErrorJobGlue job_name {}, job_run_id {}"
             .format(
                 job_name,
@@ -60,7 +60,7 @@ class Glue:
         status = self.get_job_glue(job_name=job_name, job_run_id=job_run_id)
         msg_error = status['JobRun']['ErrorMessage']
 
-        self.logger.info(
+        self.logger.debug(
             "Finishing GetMsgErrorJobGlue ErrorMessage {}"
             .format(msg_error)
         )

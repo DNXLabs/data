@@ -13,7 +13,7 @@ class Dynamo:
 
     def put_table_item(self, table, item, key, update=True):
 
-        self.logger.info(
+        self.logger.debug(
             "Starting PutTableItem Table {} DynamoDB Item {}"
             .format(
                 table,
@@ -43,13 +43,13 @@ class Dynamo:
             )
         )
 
-        self.logger.info("Finishing PutTableItem")
+        self.logger.debug("Finishing PutTableItem")
 
         return response
 
     def get_item_table(self, table, key):
 
-        self.logger.info(
+        self.logger.debug(
             "Starting GetItemTable Table {} DynamoDB Key {}"
             .format(
                 table,
@@ -67,13 +67,13 @@ class Dynamo:
 
         self.logger.debug("{}".format(result))
 
-        self.logger.info("Finishing GetItemTable")
+        self.logger.debug("Finishing GetItemTable")
 
         return result
 
     def delete_table_item(self, table, key):
 
-        self.logger.info(
+        self.logger.debug(
             "Starting DeleteTableItem Table {} DynamoDB Key {}"
             .format(
                 table,
@@ -84,15 +84,15 @@ class Dynamo:
         response = table_db.delete_item(Key=key)
 
         if response["ResponseMetadata"]["HTTPStatusCode"] == 200:
-            self.logger.info("Successful deletion")
+            self.logger.debug("Successful deletion")
             time.sleep(1)
             item = self.get_item_table(table=table, key=key)
             if len(item) > 1:
-                self.logger.info("Double check exclusion table")
+                self.logger.debug("Double check exclusion table")
                 time.sleep(1)
                 response = table_db.delete_item(Key=key)
 
-        self.logger.info(
+        self.logger.debug(
             "Finishing DeleteTableItem Table {} DynamoDB Response {}"
             .format(
                 table,
@@ -105,7 +105,7 @@ class Dynamo:
     def update_table_item(self, table, key, updateExpression, expressionAttributeValues):
 
         try:
-            self.logger.info(
+            self.logger.debug(
                 "Starting UpdateTableItem Table {} DynamoDB, Key {}, updateExpression {}, expressionAttributeValues {}"
                 .format(
                     table,
@@ -122,7 +122,7 @@ class Dynamo:
                 ExpressionAttributeValues=updateExpression,
                 ReturnValues="UPDATED_NEW"
             )
-            self.logger.info(
+            self.logger.debug(
                 "Finishing UpdateTableItem Table {} DynamoDB Response {}"
                 .format(
                     table,
@@ -142,7 +142,7 @@ class Dynamo:
 
     def get_data_dynamo_index(self, table, index_name, key, value):
 
-        self.logger.info(
+        self.logger.debug(
             "Starting GetDataIndex Table {} DynamoDB, IndexName {}, Key {}, Value {}"
             .format(
                 table,
@@ -157,7 +157,7 @@ class Dynamo:
             KeyConditionExpression=Key(key).eq(value))
         response = response['Items']
 
-        self.logger.info(
+        self.logger.debug(
             "Finishing GetDataIndex table {} DynamoDB Response {}"
             .format(
                 table,
@@ -169,7 +169,7 @@ class Dynamo:
 
     def move_data_for_another_table(self, key, list_update, table_ori, table_dest, delete_ori=True):
 
-        self.logger.info(
+        self.logger.debug(
             "Starting MoveDataForOtherTable Key {}, listUpdate {}, tableOri {},tableDest {}"
             .format(
                 key,
@@ -181,7 +181,7 @@ class Dynamo:
         item = self.get_item_table(table=table_ori, key=key)
 
         if len(item) != 0:
-            self.logger.info("MoveDataForOtherTable Line Log StageControl")
+            self.logger.debug("MoveDataForOtherTable Line Log StageControl")
 
             for key, value in list_update.items():
                 item.update({key: value})
@@ -192,7 +192,7 @@ class Dynamo:
                 key=key,
                 update=False
             )
-            self.logger.info(
+            self.logger.debug(
                 "MoveDataForOtherTable Response PutTableItem {}"
                 .format(
                     response
@@ -205,27 +205,27 @@ class Dynamo:
                     table=table_ori,
                     key=key
                 )
-                self.logger.info(
+                self.logger.debug(
                     "MoveDataForOtherTable Response DeleteTableItem {}"
                     .format(
                         response
                     )
                 )
             else:
-                self.logger.info(
-                    "self.logger.infodelete_ori {} "
+                self.logger.debug(
+                    "self.logger.debugdelete_ori {} "
                     .format(delete_ori))
-                self.logger.info(
+                self.logger.debug(
                     "MoveDataForOtherTable Invalid Response"
                 )
         else:
-            self.logger.info("MoveDataForOtherTable Invalid GetItemTable")
+            self.logger.debug("MoveDataForOtherTable Invalid GetItemTable")
 
-        self.logger.info("Finishing MoveDataForOtherTable")
+        self.logger.debug("Finishing MoveDataForOtherTable")
 
     def scan_table_all_pages(self, table, filter_key=None, filter_value=None):
 
-        self.logger.info(
+        self.logger.debug(
             "Starting ScanTableAllPages Table {},filter_key {},filter_value {}"
             .format(
                 table,
@@ -239,7 +239,7 @@ class Dynamo:
 
         if filter_key and filter_value:
             if not isinstance(filter_value, list):
-                self.logger.info(
+                self.logger.debug(
                     "ScanTableAllPages Parameter invalid {}, required list []"
                     .format(filter_value))
                 filter_value = filter_value.split(",")
@@ -271,7 +271,7 @@ class Dynamo:
                     else:
                         break
 
-        self.logger.info(
+        self.logger.debug(
             "ScanTableAllPages {}"
             .format(
                 len(items)
@@ -284,6 +284,6 @@ class Dynamo:
             )
         )
 
-        self.logger.info("Finishing ScanTableAllPages")
+        self.logger.debug("Finishing ScanTableAllPages")
 
         return items

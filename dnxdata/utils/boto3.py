@@ -13,7 +13,7 @@ class Boto3:
         self.logger = Logger("DNX Boto3 =>")
 
     def get_list_parquet(self, path):
-        self.logger.info("Starting get_list_parquet")
+        self.logger.debug("Starting get_list_parquet")
 
         keys_s3 = []
         list_path = []
@@ -43,12 +43,12 @@ class Boto3:
                 for parquet in parquets:
                     keys_s3.append(parquet)
             break
-        self.logger.info("Finishing get_list_parquet")
+        self.logger.debug("Finishing get_list_parquet")
         return keys_s3
 
     def put_object_s3(self, bucket, key, file):
 
-        self.logger.info("Starting put_object_s3")
+        self.logger.debug("Starting put_object_s3")
 
         gz_body = BytesIO()
         gz = gzip.GzipFile(None, 'wb', 9, gz_body)
@@ -63,11 +63,11 @@ class Boto3:
             Body=gz_body.getvalue()
         )
 
-        self.logger.info("Finishing put_object_s3")
+        self.logger.debug("Finishing put_object_s3")
 
     def get_object_s3(self, bucket, key, format_file=None):
 
-        self.logger.info(
+        self.logger.debug(
             "Starting GetObjectS3 format {} {}/{}"
             .format(
                 format_file,
@@ -90,12 +90,12 @@ class Boto3:
             file = file['Body'].read()
             decoded = file.decode('utf-8')
 
-        self.logger.info("Finishing GetObjectS3")
+        self.logger.debug("Finishing GetObjectS3")
 
         return decoded
 
     def move_file_s3(self, bucket_ori, key_ori, bucket_dest, key_dest):
-        self.logger.info(
+        self.logger.debug(
             "Starting MoveFileS3 Ori {}/{}  Dest {}/{}"
             .format(
                 bucket_ori,
@@ -106,22 +106,22 @@ class Boto3:
         )
 
         copy_source = {'Bucket': bucket_ori, 'Key': key_ori}
-        self.logger.info("Starting Change Bucket")
+        self.logger.debug("Starting Change Bucket")
         s3_client.copy_object(
             CopySource=copy_source,
             Bucket=bucket_dest.strip(),
             Key=key_dest.strip()
         )
-        self.logger.info("Finishing Change Bucket")
+        self.logger.debug("Finishing Change Bucket")
         time.sleep(3)
-        self.logger.info("Starting Delete File")
+        self.logger.debug("Starting Delete File")
         s3_client.delete_object(
             Bucket=bucket_ori.strip(),
             Key=key_ori.strip()
         )
-        self.logger.info("Finishing Delete File")
+        self.logger.debug("Finishing Delete File")
 
-        self.logger.info("Finishing MoveFileS3")
+        self.logger.debug("Finishing MoveFileS3")
 
     def _delete_key(self, bucket, key):
 

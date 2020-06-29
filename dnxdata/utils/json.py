@@ -13,7 +13,7 @@ class Json:
     def load_json(self, key=None, value=None):
 
         try:
-            self.logger.info(
+            self.logger.debug(
                 "Starting LoadJson File Json Key {} Value {}"
                 .format(
                     key,
@@ -36,7 +36,7 @@ class Json:
                 dict_load = dict_load[key][value]
 
             self.logger.debug(dict_load)
-            self.logger.info("Finishing LoadJson File Json")
+            self.logger.debug("Finishing LoadJson File Json")
 
             return dict_load
 
@@ -48,7 +48,7 @@ class Json:
 
     def valid_key(self, key, value=None, table=None):
 
-        self.logger.info(
+        self.logger.debug(
             "Starting ValidKey Key {} Value {} Table {}"
             .format(
                 key,
@@ -68,9 +68,9 @@ class Json:
             v_boolean = False
 
         if not v_boolean:
-            self.logger.info("Non-parameterized File the Json")
+            self.logger.debug("Non-parameterized File the Json")
 
-        self.logger.info("Finishing ValidKey Key File Json")
+        self.logger.debug("Finishing ValidKey Key File Json")
 
         return v_boolean
 

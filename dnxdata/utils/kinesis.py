@@ -12,7 +12,7 @@ class Kinesis:
 
     def conn(self):
 
-        self.logger.info(
+        self.logger.debug(
             "Starting Conn Kinesis name {}, region {}"
             .format(
                 self.name,
@@ -28,10 +28,10 @@ class Kinesis:
             self.kinesis = {"client": self.client,
                             "stream": self.stream}
 
-            self.logger.info("Finishing Conn Kinesis")
+            self.logger.debug("Finishing Conn Kinesis")
             return self.kinesis
         else:
-            self.logger.info("Invalid argument Conn Kinesis")
+            self.logger.debug("Invalid argument Conn Kinesis")
             exit(1)
 
     def send_data(self, data_binary_string, put_record="PRB"):

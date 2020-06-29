@@ -55,7 +55,7 @@ class Mysql:
 
         select = """
         SELECT column_name
-          FROM self.logger.information_schema.columns
+          FROM self.logger.debugrmation_schema.columns
           WHERE lower(table_schema) = "{}"
             AND lower(table_name) = "{}"
             AND COLUMN_KEY = "PRI"
