@@ -1,5 +1,5 @@
 import logging
-import os
+from dnxdata.utils.environments import LOG_LEVEL
 
 
 class Logger:
@@ -8,7 +8,7 @@ class Logger:
         self.header = str(header)
         logging.basicConfig()
         self.logger = logging.getLogger(__name__)
-        self.logger.setLevel(os.getenv('LOG_LEVEL', 'INFO'))
+        self.logger.setLevel(LOG_LEVEL)
 
     def info(self, msg, *args, **kwargs):
         msg = "{} {}".format(self.header, msg)

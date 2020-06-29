@@ -1,7 +1,7 @@
 import json
-import os
 from dnxdata.logger import Logger
 from dnxdata.utils.dynamo import Dynamo
+from dnxdata.utils.environments import DDB_PARAM
 
 
 class Json:
@@ -22,7 +22,7 @@ class Json:
             )
 
             param = self.dynamo.scan_table_all_pages(
-                            table=os.getenv('PARAM_TABLE')
+                            table=DDB_PARAM
                         )
             param = json.dumps(param)
             param = json.loads(param)
