@@ -48,7 +48,7 @@ class Boto3:
 
     def put_object_s3(self, bucket, key, file):
 
-        self.logger.debug("Starting put_object_s3")
+        self.logger.debug("Starting put_object_s3 {}/{}".format(bucket, key))
 
         gz_body = BytesIO()
         gz = gzip.GzipFile(None, 'wb', 9, gz_body)
