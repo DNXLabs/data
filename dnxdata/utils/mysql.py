@@ -1,5 +1,6 @@
 import pymysql
 from dnxdata.logger import Logger
+from dnxdata.utils.mapping import mysql_vs_pandas
 
 
 class Mysql:
@@ -9,10 +10,8 @@ class Mysql:
 
     def execute(self, connection_settings, script):
 
-        self.logger.debug(
-            "Starting Exec Query Mysql Script {}"
-            .format(script)
-        )
+        self.logger.debug("Starting execute")
+        self.logger.debug("{}".format(script))
 
         conn = self.connection(connection_settings=connection_settings)
 
@@ -24,13 +23,15 @@ class Mysql:
             for row in cur:
                 result.append(list(row))
 
-        self.logger.debug("Return Mysql {}".format(result))
-        self.logger.debug("Finishing Exec Query Mysql")
+        self.logger.debug("Result {}".format(result))
+
+        self.logger.debug("Finishing execute")
+
         return result
 
     def connection(self, connection_settings):
 
-        self.logger.debug("Starting Connection Mysql")
+        self.logger.debug("Starting connection")
 
         conn = pymysql.connect(
             host=connection_settings.get("host"),
@@ -40,39 +41,69 @@ class Mysql:
             connect_timeout=5
         )
 
-        self.logger.debug("Finishing Connection Mysql")
+        self.logger.debug("Finishing connection")
+
         return conn
 
     def get_primary_key(self, connection_settings, schema, table):
 
-        self.logger.debug(
-            "Starting get_primary_key schema {} table {}"
-            .format(
-                schema,
-                table
-            )
-        )
+        self.logger.debug("Starting get_primary_key")
+        self.logger.debug("Schema {} table {}".format(schema, table))
 
         select = """
         SELECT column_name
-          FROM self.logger.debugrmation_schema.columns
+          FROM information_schema.columns
           WHERE lower(table_schema) = "{}"
             AND lower(table_name) = "{}"
             AND COLUMN_KEY = "PRI"
           ORDER BY ORDINAL_POSITION """.format(schema.lower(), table.lower())
-
-        self.logger.debug("Select get_primary_key {}".format(select))
 
         result = self.execute(
             connection_settings=connection_settings,
             script=select
         )
 
-        result = []
+        primary = []
         for x in result[0]:
-            result.append(x)
+            primary.append(x)
 
-        self.logger.debug("Result {}".format(result))
+        self.logger.debug("Result {}".format(primary))
+
         self.logger.debug("Finishing get_primary_key")
 
-        return result
+        return primary
+
+    def get_list_dtypes(self, connection_settings, schema, table):
+
+        self.logger.debug("Starting get_list_data_type")
+        self.logger.debug(
+            "schema {} table {}"
+            .format(
+                schema.upper(),
+                table.upper()
+            )
+        )
+
+        select = """
+        SELECT COLUMN_NAME, DATA_TYPE
+        FROM information_schema.columns
+        WHERE lower(table_schema) = "{}"
+            AND lower(table_name) = "{}"
+        ORDER BY ORDINAL_POSITION """.format(schema.lower(), table.lower())
+
+        result = self.execute(
+            connection_settings=connection_settings,
+            script=select
+        )
+        result = {key: value for key, value in result}
+
+        list_dtypes = {}
+        for key, value in result.items():
+            list_dtypes.update({key: mysql_vs_pandas.get(value, "object")})
+
+        self.logger.debug("List DataType {}".format(list_dtypes))
+
+        self.logger.debug("Finishing get_list_data_type")
+
+        return list_dtypes
+

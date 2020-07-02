@@ -1,7 +1,6 @@
-import json
 from dnxdata.logger import Logger
 from dnxdata.utils.dynamo import Dynamo
-from dnxdata.utils.environments import DDB_PARAM
+from dnxdata.utils.environments import DDB_CONFIG
 
 
 class Json:
@@ -21,12 +20,13 @@ class Json:
                 )
             )
 
-            param = self.dynamo.scan_table_all_pages(
-                            table=DDB_PARAM
-                        )
-            param = json.dumps(param)
-            param = json.loads(param)
-            dict_load = json.loads((param[0]["param"]))
+            dict_load = self.dynamo.scan_table_all_pages(
+                table=DDB_CONFIG,
+                filter_key="key",
+                filter_value=["config"]
+            )
+
+            dict_load = dict_load[0]["param"]
 
             if key is None:
                 pass

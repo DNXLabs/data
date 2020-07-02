@@ -1,4 +1,3 @@
-import boto3
 from dnxdata.utils.utils import Utils
 from dnxdata.logger import Logger
 from dnxdata.resource import glue_client

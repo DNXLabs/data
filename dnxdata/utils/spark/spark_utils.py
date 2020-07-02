@@ -3,7 +3,7 @@ from pyspark.sql.functions import lit
 from pyspark.sql.functions import (when, col, trim)
 from pyspark.sql import functions as F
 from dnxdata.utils.utils import Utils
-from dnxdata.utils.boto3 import Boto3
+from dnxdata.utils.s3 import s3
 
 
 class SparkUtils:
@@ -13,7 +13,7 @@ class SparkUtils:
         self.log4jLogger = log4jLogger
         self.glue_context = glue_context
         self.utils = Utils()
-        self.s3 = Boto3()
+        self.s3 = s3()
 
     def save_table(self, df, path, partition_column, mode, database, table, list_path_delete):
         # TODO Why using another log manager?

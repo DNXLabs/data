@@ -57,10 +57,11 @@ class Dynamo:
         response = table_db.get_item(Key=key)
 
         result = {}
-        if response.get("Item"):
-            for key, value in response.get("Item").items():
-                if key not in ['ResponseMetadata']:
-                    result.update({key: value})
+        Item = response.get("Item")
+        if Item is not None:
+            del Item['ResponseMetadata']
+            for key, value in Item.items():
+                result.update({key: value})
 
         self.logger.debug("{}".format(result))
 
@@ -81,17 +82,15 @@ class Dynamo:
 
         table_db = dynamo_resource.Table(table)
         response = table_db.delete_item(Key=key)
+        self.check_response(response)
 
-        v_success = self.check_response(response)
-
-        if v_success:
+        time.sleep(1)
+        self.logger.debug("Double check exclusion table")
+        item = self.get_item_table(table=table, key=key)
+        if len(item) > 1:
             time.sleep(1)
-            item = self.get_item_table(table=table, key=key)
-            if len(item) > 1:
-                self.logger.debug("Double check exclusion table")
-                time.sleep(1)
-                response = table_db.delete_item(Key=key)
-                self.check_response(response)
+            response = table_db.delete_item(Key=key)
+            self.check_response(response)
 
         self.logger.debug("Finishing delete_table_item")
 
@@ -154,10 +153,7 @@ class Dynamo:
 
             if v_success and delete_ori:
                 time.sleep(2)
-                response = self.delete_table_item(
-                    table=table_ori,
-                    key=key
-                )
+                self.delete_table_item(table=table_ori, key=key)
             else:
                 self.logger.debug("delete_ori {} ".format(delete_ori))
         else:
