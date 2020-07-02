@@ -109,6 +109,7 @@ class Pandas:
     def convert_dtypes(self, df, list_dtypes):
 
         self.logger.debug("Starting fix_dtypes")
+        self.logger.debug("list_dtypes {}".format(list_dtypes))
 
         columns = []
         for col in df.dtypes.keys():
@@ -125,6 +126,7 @@ class Pandas:
                         dtype
                     )
                 )
+                continue
 
             if dtype in ["int", "bigint"]:
                 df[column] = pd.to_numeric(df[column], errors='coerce')
