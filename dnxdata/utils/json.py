@@ -91,10 +91,10 @@ class Json:
         file_json = self.load_json()
 
         try:
-            config_default = file_json["param"]
-            self.logger.debug("Config Param {}".format(config_default))
+            config_default = file_json["global"]
+            self.logger.debug("Config global {}".format(config_default))
         except Exception as e:
-            self.logger.error("Config Param not configured")
+            self.logger.error("Config global not configured")
             self.logger.error(e)
             exit(1)
 

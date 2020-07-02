@@ -1,5 +1,5 @@
 from dnxdata.utils.utils import Utils
-from dnxdata.utils.s3 import s3
+from dnxdata.utils.s3 import S3
 from dnxdata.logger import Logger
 import awswrangler as wr
 import pandas as pd
@@ -11,7 +11,7 @@ class Pandas:
     def __init__(self, region=None):
         self.region = region
         self.utils = Utils()
-        self.s3 = s3()
+        self.s3 = S3()
         self.logger = Logger("DNX Pandas =>")
 
     # You can pass list or string path or .parquet
