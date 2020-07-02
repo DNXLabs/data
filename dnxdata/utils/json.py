@@ -102,7 +102,7 @@ class Json:
             config_default_aux = file_json["database"][database]["config"]
             config_default.update(config_default_aux)
             self.logger.debug(
-                "Config Default Database {}"
+                "Config database {}"
                 .format(
                     config_default_aux
                 )
@@ -124,7 +124,7 @@ class Json:
             config_default.update({"database_rds": database})
 
             self.logger.debug(
-                "Config Table {}"
+                "Config table {}"
                 .format(config_aux)
             )
         except Exception as e:
@@ -135,7 +135,7 @@ class Json:
             exit(1)
 
         self.logger.debug(
-            "Return config, default and exception {}"
+            "Return global, database and table {}"
             .format(config_default)
         )
 

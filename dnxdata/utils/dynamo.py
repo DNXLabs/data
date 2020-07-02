@@ -57,9 +57,8 @@ class Dynamo:
         response = table_db.get_item(Key=key)
 
         result = {}
-        Item = response.get("Item")
+        Item = response.get("Item", None)
         if Item is not None:
-            del Item['ResponseMetadata']
             for key, value in Item.items():
                 result.update({key: value})
 
