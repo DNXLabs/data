@@ -1,38 +1,27 @@
 import sys
-from pyspark.sql.functions import lit
-from pyspark.sql.functions import (when, col, trim)
-from pyspark.sql import functions as F
+from pyspark.sql.functions import (when, col, trim, lit)
 from dnxdata.utils.utils import Utils
 from dnxdata.utils.s3 import s3
+from dnxdata.logger import Logger
 
 
 class SparkUtils:
 
-    def __init__(self, spark, glue_context, log4jLogger):
+    def __init__(self, spark, glue_context):
+        self.logger = Logger("Metrics-Utils =>")
         self.spark = spark
-        self.log4jLogger = log4jLogger
         self.glue_context = glue_context
         self.utils = Utils()
         self.s3 = s3()
 
-    def save_table(self, df, path, partition_column, mode, database, table, list_path_delete):
-        # TODO Why using another log manager?
-        logger = self.log4jLogger.LogManager.getLogger(__name__ + "." + self.__class__.__name__ + "." + sys._getframe().f_code.co_name)
+    def write_parquet(self, df, path, partition_column, mode, database, table, list_path_delete):
 
-        logger.info("Metrics-Common => Starting save table")
-        logger.info(
-            "Metrics-Common => Database + Table {}.{}"
-            .format(
-                database,
-                table
-            )
-        )
+        self.logger.info("Starting write_parquet")
+        self.logger.info("Database + Table {}.{}".format(database, table))
 
         self.is_empty_df(df=df, exit_none=True)
 
         self.spark.catalog.setCurrentDatabase(database)
-
-        df = df.withColumn("dt_process_parq", lit(self.utils.date_time()).cast("timestamp"))
 
         if len(list_path_delete) > 0:
             self.s3.delete_file_s3(path=list_path_delete, path_or_key="path")
@@ -51,93 +40,94 @@ class SparkUtils:
 
         self.spark.catalog.refreshTable("{}.{}".format(database, table))
 
-        logger.info("Metrics-Common => Finishing save table")
+        self.logger.info("Finishing write_parquet")
 
     def is_empty_df(self, df, exit_none=False):
-        # TODO Why using another log manager?
-        logger = self.log4jLogger.LogManager.getLogger(
-            __name__ + "." + self.__class__.__name__ + "." + sys._getframe().f_code.co_name
-        )
 
-        logger.info("Metrics-Common => Starting IsEmptyDf")
+        self.logger.debug("Starting is_empty_df")
+        self.logger.debug("exit_none {}".format(exit_none))
 
         v_invalid_df = True if df.rdd.isEmpty() else False
 
         if exit_none & v_invalid_df:
-            logger.info("Metrics-Common => IsEmptyDf Invalid Data Frame v_invalid_df {}".format(v_invalid_df))
+            self.logger.info("Invalid DF {}".format(v_invalid_df))
             sys.exit(1)
             return
 
-        logger.info(
-            "Metrics-Common => Finishing IsEmptyDf v_invalid_df {}"
-            .format(v_invalid_df)
-        )
+        self.logger.debug("v_invalid_df {}".format(v_invalid_df))
+
+        self.logger.debug("Finishing is_empty_df")
 
         return v_invalid_df
 
-    def union_data_frame(self, df1, df2):
-        # TODO Why using another log manager?
-        logger = self.log4jLogger.LogManager.getLogger(__name__ + "." + self.__class__.__name__ + "." + sys._getframe().f_code.co_name)
+    def union_df(self, df1, df2):
 
-        logger.info("Metrics-Common => Starting UnionDataFrame")
-        logger.info("Metrics-Common => count 1 {}".format(df1.count()))
-        logger.info("Metrics-Common => count 2 {}".format(df2.count()))
+        self.logger.info("Starting union_df")
+        self.logger.debug("count df1 {}".format(df1.count()))
+        self.logger.debug("count df2 {}".format(df2.count()))
 
         # Add missing columns to df1
         df_left = df1
         for column in set(df2.columns) - set(df1.columns):
-            df_left = df_left.withColumn(column, F.lit(None))
+            df_left = df_left.withColumn(column, lit(None))
 
         # Add missing columns to df2
         df_right = df2
         for column in set(df1.columns) - set(df2.columns):
-            df_right = df_right.withColumn(column, F.lit(None))
-
-        logger.info("Metrics-Common => Finishing UnionDataFrame")
+            df_right = df_right.withColumn(column, lit(None))
 
         # Make sure columns are ordered the same
         df = df_left.union(df_right.select(df_left.columns))
-        logger.info("Metrics-Common => count 3 {}".format(df.count()))
+
+        self.logger.debug("count union {}".format(df.count()))
+
+        self.logger.info("Finishing union_df")
+
         return df
 
-    def fix_dtypes(self, df, list_col_dtypes, col_name_last_update):
-        logger = self.log4jLogger.LogManager.getLogger(__name__ + "." + self.__class__.__name__ + "." + sys._getframe().f_code.co_name)
+    def convert_dtypes(self, df, list_dtypes):
 
-        logger.info("Metrics-Common => Starting FixValueNull")
-        logger.info("Metrics-Common => list_col_dtypes {}".format(list_col_dtypes))
+        self.logger.info("Starting convert_dtypes")
+        self.logger.info("list_col_dtypes {}".format(list_dtypes))
 
         dtypes = df.dtypes
         for row in dtypes:
             column = row[0]
-            _dtypes = list_col_dtypes.get(column)
+            dtype = list_dtypes.get(column)
 
-            if _dtypes is None:
-                logger.info("Metrics-Common => Column not parameterized {}".format(row))
+            if dtype is None:
+                self.logger.warning(
+                    "Column {} type {} doesn't in mapping, please verify."
+                    .format(
+                        column,
+                        dtype
+                    )
+                )
                 continue
 
-            if (_dtypes in ["double", "integer", "float"]) | (_dtypes.find("decimal") >= 0):
-                logger.info("Metrics-Common => FixValueNull Number row {}".format(row))
-                df = df.withColumn(column, when(trim(col(column)).isNull(), "0")
-                                   .otherwise(trim(col(column))))
-                df = df.withColumn(column, col(column).cast(_dtypes))
-            elif _dtypes == "string":
-                logger.info("Metrics-Common => FixValueNull String row {}".format(row))
+            equal_number = dtype in ["double", "integer", "float"]
+            find_decimal = dtype.find("decimal") >= 0
+            if equal_number or find_decimal:
+                df = df.withColumn(
+                    column,
+                    when(trim(col(column)).isNull(), "0")
+                    .otherwise(trim(col(column)))
+                )
+                df = df.withColumn(column, col(column).cast(dtype))
+
+            elif dtype == "string":
                 df = df.withColumn(column, trim(col(column)))
 
-            elif _dtypes == "timestamp":
-                logger.info("Metrics-Common => FixValueNull Timestamp row {}".format(row))
-                if column == col_name_last_update:
-                    df = df.withColumn(column, trim(col(column)).cast(_dtypes))
-                else:
-                    df = df.withColumn(column, trim(col(column)).cast("string"))
+            elif dtype == "timestamp":
+                df = df.withColumn(column, trim(col(column)).cast(dtype))
 
-        logger.info("Metrics-Common => Finishing FixValueNull")
+        self.logger.info("Finishing convert_dtypes")
+
         return df
 
     def get_data_rds(self, connection_type, connection_settings):
 
-        logger = self.log4jLogger.LogManager.getLogger(__name__ + "." + self.__class__.__name__ + "." + sys._getframe().f_code.co_name)
-        logger.info("Metrics-Common => Starting get_data_rds")
+        self.logger.info("Starting get_data_rds")
 
         if connection_type == "mysql":
             conn = {
@@ -157,11 +147,11 @@ class SparkUtils:
 
             df = df.toDF()
 
-        logger.info("Metrics-Common => Start Show Data frame RDS")
+        self.logger.info("Start Show DF RDS")
         df.printSchema()
         df.show()
-        logger.info("Metrics-Common => Finish Show Data frame RDS")
+        self.logger.info("Finish Show DF RDS")
 
-        logger.info("Metrics-Common => Finishing get_data_rds")
+        self.logger.info("Finishing get_data_rds")
 
         return df

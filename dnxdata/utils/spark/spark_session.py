@@ -3,24 +3,34 @@ from pyspark import SparkFiles
 from pyspark.sql import SparkSession
 from pyspark.context import SparkContext
 from awsglue.context import GlueContext
+from dnxdata.logger import Logger
 
 
-class ModSparkSession:
+logger = Logger("Metrics-Transformer =>")
 
-    def __init__(self):
-        pass
 
-    def start(self):
-        self.spark = SparkSession.builder \
-                                 .appName("Metrics-Common - Data ETL Glue") \
-                                 .enableHiveSupport() \
-                                 .getOrCreate()
-        sys.path.insert(0, SparkFiles.getRootDirectory())
+def spark():
 
-        self.log4jLogger = self.spark._jvm.org.apache.log4j
-        self.glue_context = GlueContext(SparkContext.getOrCreate())
-        self.spark.conf.set(
-            "spark.sql.legacy.allowCreatingManagedTableUsingNonemptyLocation",
-            "true"
-        )
-        return [self.spark, self.log4jLogger, self.glue_context]
+    logger.debug("Starting SparkSession")
+
+    spark = SparkSession \
+        .builder.appName("Metrics-Transformer => - Data ETL Glue") \
+        .enableHiveSupport() \
+        .getOrCreate()
+
+    sys.path.insert(0, SparkFiles.getRootDirectory())
+
+    logger.debug("Finishing SparkSession")
+
+    return spark
+
+
+def glue_context():
+
+    logger.debug("Starting glue_context")
+
+    glue = GlueContext(SparkContext.getOrCreate())
+
+    logger.debug("Finishing glue_context")
+
+    return glue
