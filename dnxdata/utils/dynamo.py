@@ -11,7 +11,7 @@ class Dynamo:
         self.utils = Utils()
         self.logger = Logger("DNX Dynamo =>")
 
-    def put_table_item(self, table, item, key, update=True):
+    def put_table_item(self, table, item, key, field_update="timestamp", update=True):
 
         self.logger.debug("Starting put_table_item")
         self.logger.debug(
@@ -32,7 +32,7 @@ class Dynamo:
         else:
             item_get = item
 
-        item_get.update({"timestamp": self.utils.date_time(milliseconds=True)})
+        item_get.update({field_update: self.utils.date_time(milliseconds=True)})
         table_db = dynamo_resource.Table(table)
         response = table_db.put_item(Item=item_get)
 

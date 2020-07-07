@@ -15,7 +15,7 @@ class S3:
     def get_object_s3(self, bucket, key, format_file=None):
 
         self.logger.debug("Starting get_object_s3")
-        self.logger.debug("Format {} {}/{}".format(format_file, bucket, key))
+        self.logger.debug("format {} {}/{}".format(format_file, bucket, key))
 
         file = s3_client.get_object(Bucket=bucket, Key=key)
 
@@ -74,14 +74,21 @@ class S3:
         self.logger.debug("Starting delete_key")
 
         v_count = 0
-        while v_count < 3:
+        while v_count < 2:
             v_count += 1
             try:
                 s3_resource.Object(bucket, key).delete()
+                self.logger.debug(
+                    "File deleted {}/{}"
+                    .format(
+                        bucket,
+                        key
+                    )
+                )
+
                 time.sleep(1)
             except Exception as e:
                 self.logger.error(e)
-                pass
 
         self.logger.debug("Finishing delete_key")
 
@@ -125,14 +132,7 @@ class S3:
                 keys_s3.append("s3://" + str(bucket) + "/" + _.key)
 
         if len(keys_s3) == 0:
-            self.logger.debug(
-                "No {} found in bucket {}/{}"
-                .format(
-                    endswith,
-                    bucket,
-                    filepath
-                )
-            )
+            self.logger.debug("0 file in bucket")
         else:
             for p in keys_s3:
                 self.logger.debug("S3Keys {}".format(p))
@@ -202,23 +202,9 @@ class S3:
 
                 if path_or_key.lower() == "path":
                     for obj in bucket.objects.filter(Prefix=_key):
-                        self.logger.debug(
-                            "File deleted {}/{}"
-                            .format(
-                                _bucket,
-                                obj.key
-                            )
-                        )
                         self.delete_key(bucket=_bucket, key=obj.key)
 
                 elif path_or_key.lower() == "key":
-                    self.logger.debug(
-                        "File deleted {}/{}"
-                        .format(
-                            _bucket,
-                            _key
-                        )
-                    )
                     self.delete_key(bucket=_bucket, key=_key)
             break
 
