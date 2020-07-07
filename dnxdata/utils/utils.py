@@ -1,6 +1,7 @@
 import dateutil.tz
 from datetime import datetime
 from dnxdata.logger import Logger
+from dnxdata.utils.constants import TIMESTAMP
 
 
 class Utils:
@@ -73,3 +74,16 @@ class Utils:
         key = "/".join(path.split("/")[1:])
 
         return bucket, key
+
+    def get_diff_data_seconds(self, dt_before, dt_current=None):
+
+        if dt_current is None:
+            dt_current = datetime.strptime(self.date_time(), TIMESTAMP)
+        else:
+            dt_current = datetime.strptime(str(dt_current)[:19], TIMESTAMP)
+
+        dt_before = str(dt_before)[:19]
+        dt_before = datetime.strptime(dt_before, TIMESTAMP)
+        seconds = (dt_current - dt_before).total_seconds()
+
+        return seconds

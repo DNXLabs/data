@@ -12,6 +12,135 @@ class S3:
         self.utils = Utils()
         self.logger = Logger("DNX S3 =>")
 
+    def get_object_s3(self, bucket, key, format_file=None):
+
+        self.logger.debug("Starting get_object_s3")
+        self.logger.debug("Format {} {}/{}".format(format_file, bucket, key))
+
+        file = s3_client.get_object(Bucket=bucket, Key=key)
+
+        if format_file is not None:
+            if format_file.lower() == "gz":
+                bytestream = BytesIO(file['Body'].read())
+                decoded = gzip.GzipFile(
+                    None,
+                    'rb',
+                    fileobj=bytestream
+                ).read().decode('utf-8')
+        else:
+            file = file['Body'].read()
+            decoded = file.decode('utf-8')
+
+        self.logger.debug("Finishing get_object_s3")
+
+        return decoded
+
+    def put_object_s3(self, bucket, key, file):
+
+        self.logger.debug("Starting put_object_s3")
+        self.logger.debug("Target {}/{}".format(bucket, key))
+
+        gz_body = BytesIO()
+        gz = gzip.GzipFile(None, 'wb', 9, gz_body)
+        gz.write(str(file).encode('utf-8'))  # convert unicode strings to bytes
+        gz.close()
+        # GzipFile has written the compressed bytes into our gz_body
+        s3_client.put_object(
+            Bucket=bucket,
+            Key=key,  # Note: NO .gz extension!
+            ContentType='text/plain',  # the original type
+            ContentEncoding='gzip',  # MUST have or browsers will error
+            Body=gz_body.getvalue()
+        )
+
+        self.logger.debug("Finishing put_object_s3")
+
+    def copy_object_s3(self, bucket_ori, key_ori, bucket_dest, key_dest):
+
+        self.logger.debug("Starting copy_object_s3")
+
+        copy_source = {'Bucket': bucket_ori, 'Key': key_ori}
+
+        s3_client.copy_object(
+            CopySource=copy_source,
+            Bucket=bucket_dest.strip(),
+            Key=key_dest.strip()
+        )
+
+        self.logger.debug("Finishing copy_object_s3")
+
+    def delete_key(self, bucket, key):
+
+        self.logger.debug("Starting delete_key")
+
+        v_count = 0
+        while v_count < 3:
+            v_count += 1
+            try:
+                s3_resource.Object(bucket, key).delete()
+                time.sleep(1)
+            except Exception as e:
+                self.logger.error(e)
+                pass
+
+        self.logger.debug("Finishing delete_key")
+
+    def move_file_s3(self, bucket_ori, key_ori, bucket_dest, key_dest):
+
+        self.logger.debug("Starting move_file_s3")
+        self.logger.debug(
+            "Ori {}/{}  Dest {}/{}"
+            .format(
+                bucket_ori,
+                key_ori,
+                bucket_dest,
+                key_dest
+            )
+        )
+
+        self.copy_object_s3(bucket_ori, key_ori, bucket_dest, key_dest)
+
+        equal_bucket = bucket_ori == bucket_dest
+        equal_key = key_ori == key_dest
+
+        if not equal_bucket or not equal_key:
+            self.delete_key(bucket=bucket_ori, key=key_ori)
+
+        self.logger.debug("Finishing move_file_s3")
+
+    def get_list_file(self, bucket, filepath, endswith):
+
+        self.logger.debug("Starting get_list_file")
+        self.logger.debug("File {}/{}/*{}".format(bucket, filepath, endswith))
+
+        if not filepath.endswith('/'):
+            filepath += '/'
+
+        prefix = filepath[1:] if filepath.startswith("/") else filepath
+        _bucket = s3_resource.Bucket(bucket)
+
+        keys_s3 = []
+        for _ in _bucket.objects.filter(Prefix=prefix):
+            if _.key.endswith(endswith):
+                keys_s3.append("s3://" + str(bucket) + "/" + _.key)
+
+        if len(keys_s3) == 0:
+            self.logger.debug(
+                "No {} found in bucket {}/{}"
+                .format(
+                    endswith,
+                    bucket,
+                    filepath
+                )
+            )
+        else:
+            for p in keys_s3:
+                self.logger.debug("S3Keys {}".format(p))
+
+        self.logger.debug("Finishing get_list_file")
+
+        return keys_s3
+
     def get_list_parquet(self, path):
 
         self.logger.debug("Starting get_list_parquet")
@@ -50,92 +179,6 @@ class S3:
 
         return keys_s3
 
-    def put_object_s3(self, bucket, key, file):
-
-        self.logger.debug("Starting put_object_s3")
-        self.logger.debug("Target {}/{}".format(bucket, key))
-
-        gz_body = BytesIO()
-        gz = gzip.GzipFile(None, 'wb', 9, gz_body)
-        gz.write(str(file).encode('utf-8'))  # convert unicode strings to bytes
-        gz.close()
-        # GzipFile has written the compressed bytes into our gz_body
-        s3_client.put_object(
-            Bucket=bucket,
-            Key=key,  # Note: NO .gz extension!
-            ContentType='text/plain',  # the original type
-            ContentEncoding='gzip',  # MUST have or browsers will error
-            Body=gz_body.getvalue()
-        )
-
-        self.logger.debug("Finishing put_object_s3")
-
-    def get_object_s3(self, bucket, key, format_file=None):
-
-        self.logger.debug("Starting get_object_s3")
-        self.logger.debug("Format {} {}/{}".format(format_file, bucket, key))
-
-        file = s3_client.get_object(Bucket=bucket, Key=key)
-
-        if format_file is not None:
-            if format_file.lower() == "gz":
-                bytestream = BytesIO(file['Body'].read())
-                decoded = gzip.GzipFile(
-                    None,
-                    'rb',
-                    fileobj=bytestream
-                ).read().decode('utf-8')
-        else:
-            file = file['Body'].read()
-            decoded = file.decode('utf-8')
-
-        self.logger.debug("Finishing get_object_s3")
-
-        return decoded
-
-    def move_file_s3(self, bucket_ori, key_ori, bucket_dest, key_dest):
-
-        self.logger.debug("Starting move_file_s3")
-        self.logger.debug(
-            "Ori {}/{}  Dest {}/{}"
-            .format(
-                bucket_ori,
-                key_ori,
-                bucket_dest,
-                key_dest
-            )
-        )
-
-        copy_source = {'Bucket': bucket_ori, 'Key': key_ori}
-        self.logger.debug("Starting change bucket")
-        s3_client.copy_object(
-            CopySource=copy_source,
-            Bucket=bucket_dest.strip(),
-            Key=key_dest.strip()
-        )
-        self.logger.debug("Finishing change bucket")
-        time.sleep(3)
-        self.logger.debug("Starting delete file")
-        s3_client.delete_object(
-            Bucket=bucket_ori.strip(),
-            Key=key_ori.strip()
-        )
-        self.logger.debug("Finishing delete file")
-
-        self.logger.debug("Finishing move_file_s3")
-
-    def _delete_key(self, bucket, key):
-
-        v_count = 0
-        while v_count < 3:
-            v_count += 1
-            try:
-                s3_resource.Object(bucket, key).delete()
-                time.sleep(1)
-            except Exception as e:
-                self.logger.error(e)
-                pass
-
     def delete_file_s3(self, path, path_or_key="key"):
 
         self.logger.debug("Starting delete_file_s3")
@@ -166,7 +209,7 @@ class S3:
                                 obj.key
                             )
                         )
-                        self._delete_key(bucket=_bucket, key=obj.key)
+                        self.delete_key(bucket=_bucket, key=obj.key)
 
                 elif path_or_key.lower() == "key":
                     self.logger.debug(
@@ -176,46 +219,7 @@ class S3:
                             _key
                         )
                     )
-                    self._delete_key(bucket=_bucket, key=_key)
+                    self.delete_key(bucket=_bucket, key=_key)
             break
 
         self.logger.debug("Finishing delete_file_s3")
-
-    def get_list_file(self, bucket, filepath, endswith):
-
-        self.logger.debug("Starting get_list_file")
-        self.logger.debug("File {}/{}/*{}".format(bucket, filepath, endswith))
-
-        if not filepath.endswith('/'):
-            filepath += '/'
-
-        """
-        path = "{}/{}".format(bucket, filepath)
-        desc = wr.s3.describe_objects(path, wait_time=30)
-        S3keys = [key for key in desc if key.endswith(endswith)]
-        This call above is problem.
-        """
-        prefix = filepath[1:] if filepath.startswith("/") else filepath
-        _bucket = s3_resource.Bucket(bucket)
-
-        keys_s3 = []
-        for _ in _bucket.objects.filter(Prefix=prefix):
-            if _.key.endswith(endswith):
-                keys_s3.append("s3://" + str(bucket) + "/" + _.key)
-
-        if len(keys_s3) == 0:
-            self.logger.debug(
-                "No {} found in bucket {}/{}"
-                .format(
-                    endswith,
-                    bucket,
-                    filepath
-                )
-            )
-        else:
-            for p in keys_s3:
-                self.logger.debug("S3Keys {}".format(p))
-
-        self.logger.debug("Finishing get_list_file")
-
-        return keys_s3
