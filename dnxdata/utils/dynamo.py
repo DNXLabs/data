@@ -84,7 +84,7 @@ class Dynamo:
         self.check_response(response)
 
         time.sleep(1)
-        self.logger.debug("Double check exclusion table")
+        self.logger.debug("Double check exclusion line table")
         item = self.get_item_table(table=table, key=key)
         if len(item) > 1:
             time.sleep(1)
