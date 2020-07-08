@@ -23,10 +23,7 @@ class Utils:
         key = "/".join(path.split("/")[1:-1])
 
         source = {"bucket": bucket.strip(), "key": key.strip()}
-        self.logger.debug(
-            "Get Bucket key source {}"
-            .format(source)
-        )
+
         return source
 
     def get_path_file_processed(self, path, file_status):

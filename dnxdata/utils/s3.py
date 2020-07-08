@@ -73,22 +73,14 @@ class S3:
 
         self.logger.debug("Starting delete_key")
 
-        v_count = 0
-        while v_count < 2:
-            v_count += 1
-            try:
-                s3_resource.Object(bucket, key).delete()
-                self.logger.debug(
-                    "File deleted {}/{}"
-                    .format(
-                        bucket,
-                        key
-                    )
-                )
-
-                time.sleep(1)
-            except Exception as e:
-                self.logger.error(e)
+        s3_resource.Object(bucket, key).delete()
+        self.logger.debug(
+            "File deleted {}/{}"
+            .format(
+                bucket,
+                key
+            )
+        )
 
         self.logger.debug("Finishing delete_key")
 
