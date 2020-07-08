@@ -23,7 +23,7 @@ class Dynamo:
         )
 
         if update:
-            item_get = self.get_item_table(table=table, key=key)
+            item_get = self.get_table_item(table=table, key=key)
             if len(item_get) != 0:
                 for key, value in item.items():
                     item_get.update({key: value})
@@ -32,7 +32,11 @@ class Dynamo:
         else:
             item_get = item
 
-        item_get.update({field_update: self.utils.date_time(milliseconds=True)})
+        item_get.update(
+            {
+                field_update: self.utils.date_time(milliseconds=True)
+            }
+        )
         table_db = dynamo_resource.Table(table)
         response = table_db.put_item(Item=item_get)
 
@@ -42,9 +46,9 @@ class Dynamo:
 
         return response
 
-    def get_item_table(self, table, key):
+    def get_table_item(self, table, key):
 
-        self.logger.debug("Starting get_item_table")
+        self.logger.debug("Starting get_table_item")
         self.logger.debug(
             "Table {} DynamoDB Key {}"
             .format(
@@ -64,7 +68,7 @@ class Dynamo:
 
         self.logger.debug("{}".format(result))
 
-        self.logger.debug("Finishing get_item_table")
+        self.logger.debug("Finishing get_table_item")
 
         return result
 
@@ -85,8 +89,8 @@ class Dynamo:
 
         time.sleep(1)
         self.logger.debug("Double check exclusion line table")
-        item = self.get_item_table(table=table, key=key)
-        if len(item) > 1:
+        item = self.get_table_item(table=table, key=key)
+        if len(item) > 0:
             time.sleep(1)
             response = table_db.delete_item(Key=key)
             self.check_response(response)
@@ -133,7 +137,7 @@ class Dynamo:
             )
         )
 
-        item = self.get_item_table(table=table_ori, key=key)
+        item = self.get_table_item(table=table_ori, key=key)
 
         if len(item) != 0:
             self.logger.debug("Moving line for table StageControlLog")
