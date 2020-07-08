@@ -1,13 +1,13 @@
 from dnxdata.logger import Logger
 from dnxdata.utils.dynamo import Dynamo
-from dnxdata.utils.environments import DDB_CONFIG
 
 
 class Json:
 
-    def __init__(self):
+    def __init__(self, table):
         self.logger = Logger("DNX Json =>")
         self.dynamo = Dynamo()
+        self.table = table
 
     def load_json(self, key=None, value=None):
 
@@ -21,7 +21,7 @@ class Json:
             )
 
             dict_load = self.dynamo.scan_table_all_pages(
-                table=DDB_CONFIG,
+                table=self.table,
                 filter_key="key",
                 filter_value=["config"]
             )
