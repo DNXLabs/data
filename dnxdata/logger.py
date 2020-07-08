@@ -1,5 +1,5 @@
 import logging
-from dnxdata.utils.environments import LOG_LEVEL
+from dnxdata.environments import LOG_LEVEL
 
 
 class Logger:
