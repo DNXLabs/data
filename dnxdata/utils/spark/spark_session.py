@@ -36,8 +36,6 @@ def _glue_context():
     return glue
 
 
-if __name__ == "__main__":
+spark = _spark()
 
-    spark = _spark()
-
-    glue_context = _glue_context()
+glue_context = _glue_context()
