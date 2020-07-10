@@ -106,4 +106,3 @@ class Mysql:
         self.logger.debug("Finishing get_list_data_type")
 
         return list_dtypes
-

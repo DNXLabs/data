@@ -5,7 +5,6 @@ from dnxdata.logger import Logger
 from dnxdata.resource import s3_client, s3_resource
 from io import BytesIO
 
-
 class S3:
 
     def __init__(self):

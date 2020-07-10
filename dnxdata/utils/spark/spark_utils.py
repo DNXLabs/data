@@ -1,7 +1,7 @@
 import sys
 from pyspark.sql.functions import (when, col, trim, lit)
 from dnxdata.utils.utils import Utils
-from dnxdata.utils.s3 import s3
+from dnxdata.utils.s3 import S3
 from dnxdata.logger import Logger
 
 
@@ -12,7 +12,7 @@ class SparkUtils:
         self.spark = spark
         self.glue_context = glue_context
         self.utils = Utils()
-        self.s3 = s3()
+        self.s3 = S3()
 
     def write_parquet(self, df, path, partition_column, mode, database, table, list_path_delete):
 
