@@ -25,8 +25,8 @@ class Dynamo:
         if update:
             item_get = self.get_table_item(table=table, key=key)
             if len(item_get) != 0:
-                for key, value in item.items():
-                    item_get.update({key: value})
+                for _key, _value in item.items():
+                    item_get.update({_key: _value})
             else:
                 item_get = item
         else:
@@ -63,8 +63,8 @@ class Dynamo:
         result = {}
         Item = response.get("Item", None)
         if Item is not None:
-            for key, value in Item.items():
-                result.update({key: value})
+            for _key, _value in Item.items():
+                result.update({_key: _value})
 
         self.logger.debug("{}".format(result))
 
