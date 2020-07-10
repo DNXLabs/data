@@ -97,12 +97,8 @@ class Mysql:
         )
         result = {key: value for key, value in result}
 
-        list_dtypes = {}
-        for key, value in result.items():
-            list_dtypes.update({key: mysql_vs_pandas.get(value, "object")})
-
-        self.logger.debug("List DataType {}".format(list_dtypes))
+        self.logger.debug("List DataType {}".format(result))
 
         self.logger.debug("Finishing get_list_data_type")
 
-        return list_dtypes
+        return result
