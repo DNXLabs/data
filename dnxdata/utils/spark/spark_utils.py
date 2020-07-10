@@ -17,14 +17,11 @@ class SparkUtils:
     def write_parquet(self, df, path, partition_column, mode, database, table, list_path_delete):
 
         self.logger.info("Starting write_parquet")
-        self.logger.info("Database + Table {}.{}".format(database, table))
+        self.logger.info("database.table => {}.{}".format(database, table))
 
         self.is_empty_df(df=df, exit_none=True)
 
         self.spark.catalog.setCurrentDatabase(database)
-
-        if len(list_path_delete) > 0:
-            self.s3.delete_file_s3(path=list_path_delete, path_or_key="path")
 
         write_obj = df.write. \
             format("parquet"). \
@@ -37,6 +34,9 @@ class SparkUtils:
             write_obj = write_obj.partitionBy(partition_column)
 
         write_obj.saveAsTable(table)
+
+        if len(list_path_delete) > 0:
+            self.s3.delete_file_s3(path=list_path_delete, path_or_key="key")
 
         self.spark.catalog.refreshTable("{}.{}".format(database, table))
 
@@ -138,7 +138,8 @@ class SparkUtils:
                 ),
                 "dbtable": connection_settings.get("dbtable"),
                 "user": connection_settings.get("user"),
-                "password": connection_settings.get("passwd")}
+                "password": connection_settings.get("passwd")
+            }
 
             df = self.glue_context.create_dynamic_frame.from_options(
                 connection_type=connection_type,
