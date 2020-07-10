@@ -1,18 +1,21 @@
 import boto3
+import os
+
+AWS_REGION = os.getenv("AWS_REGION", None)
 
 # S3
-s3_client = boto3.client('s3')
-s3_resource = boto3.resource('s3')
+s3_client = boto3.client('s3', region_name=AWS_REGION)
+s3_resource = boto3.resource('s3', region_name=AWS_REGION)
 
 # Dynamodb
-dynamo_client = boto3.client('dynamodb')
-dynamo_resource = boto3.resource('dynamodb')
+dynamo_client = boto3.client('dynamodb', region_name=AWS_REGION)
+dynamo_resource = boto3.resource('dynamodb', region_name=AWS_REGION)
 
 # Glue
-glue_client = boto3.client("glue")
+glue_client = boto3.client("glue", region_name=AWS_REGION)
 
 # Lambda
-lambda_client = boto3.client('lambda')
+lambda_client = boto3.client('lambda', region_name=AWS_REGION)
 
 # SSM
-ssm_client = boto3.client('ssm')
+ssm_client = boto3.client('ssm', region_name=AWS_REGION)
