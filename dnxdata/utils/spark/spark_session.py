@@ -9,7 +9,7 @@ from dnxdata.logger import Logger
 logger = Logger("Metrics-Transformer =>")
 
 
-def spark():
+def _spark():
 
     logger.debug("Starting SparkSession")
 
@@ -25,7 +25,7 @@ def spark():
     return spark
 
 
-def glue_context():
+def _glue_context():
 
     logger.debug("Starting glue_context")
 
@@ -34,3 +34,10 @@ def glue_context():
     logger.debug("Finishing glue_context")
 
     return glue
+
+
+if __name__ == "__main__":
+
+    spark = _spark()
+
+    glue_context = _glue_context()
