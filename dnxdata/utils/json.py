@@ -12,13 +12,8 @@ class Json:
     def load_json(self, key=None, value=None):
 
         try:
-            self.logger.debug(
-                "Starting LoadJson File Json Key {} Value {}"
-                .format(
-                    key,
-                    value
-                )
-            )
+            self.logger.debug("Starting load_json")
+            self.logger.debug("filter json key {} value {}".format(key, value))
 
             dict_load = self.dynamo.scan_table_all_pages(
                 table=self.table,
@@ -26,7 +21,7 @@ class Json:
                 filter_value=["config"]
             )
 
-            dict_load = dict_load[0]["param"]
+            dict_load = dict_load[0]["parameters"]
 
             if key is None:
                 pass
@@ -36,15 +31,12 @@ class Json:
                 dict_load = dict_load[key][value]
 
             self.logger.debug(dict_load)
-            self.logger.debug("Finishing LoadJson File Json")
 
+            self.logger.debug("Finishing load_json")
             return dict_load
 
         except Exception as e:
-            self.logger.error(
-                "Error Load File Json: {} "
-                .format(e)
-            )
+            self.logger.error("Error load_json: {} ".format(e))
 
     def valid_key(self, key, value=None, table=None):
 
@@ -79,64 +71,41 @@ class Json:
         table = table.upper()
         database = database.lower()
 
-        self.logger.debug(
-            "Starting get_config Json Database {} Table {}".format(
-                database,
-                table
-            )
-        )
+        self.logger.debug("Starting get_config")
+        self.logger.debug("database {} table {}".format(database, table))
 
-        config_default = {}
+        config = {}
 
         file_json = self.load_json()
 
         try:
-            config_default = file_json["global"]
-            self.logger.debug("Config global {}".format(config_default))
+            config = file_json["global"]
+            self.logger.debug("global config {}".format(config))
         except Exception as e:
-            self.logger.error("Config global not configured")
+            self.logger.error("global config not configured")
             self.logger.error(e)
             exit(1)
 
         try:
-            config_default_aux = file_json["database"][database]["config"]
-            config_default.update(config_default_aux)
-            self.logger.debug(
-                "Config database {}"
-                .format(
-                    config_default_aux
-                )
-            )
+            config_database = file_json["database"][database]["config"]
+            config.update(config_database)
+            self.logger.debug("database config {}".format(config_database))
         except Exception as e:
-            self.logger.error(
-                "Config Default not configured for the database {} table {}"
-                .format(
-                    database,
-                    table
-                )
-            )
+            self.logger.error("database config not configured")
             self.logger.error(e)
             exit(1)
 
         try:
-            config_aux = file_json["database"][database]["table"][table]
-            config_default.update(config_aux)
-            config_default.update({"database_rds": database})
-
-            self.logger.debug(
-                "Config table {}"
-                .format(config_aux)
-            )
+            config_table = file_json["database"][database]["table"][table]
+            config.update(config_table)
+            config.update({"database_rds": database})
+            self.logger.debug("table config {}".format(config_table))
         except Exception as e:
-            self.logger.debug(
-                "Error Return Config Default {}"
-                .format(str(e))
-            )
+            self.logger.debug("table config not configured")
+            self.logger.error(e)
             exit(1)
 
-        self.logger.debug(
-            "Return global, database and table {}"
-            .format(config_default)
-        )
+        self.logger.debug("complete merge config {}".format(config))
+        self.logger.debug("Finishing get_config")
 
-        return config_default
+        return config
