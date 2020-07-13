@@ -14,7 +14,7 @@ class SparkUtils:
         self.utils = Utils()
         self.s3 = S3()
 
-    def write_parquet(self, df, path, partition_column, mode, database, table, list_path_delete):
+    def write_parquet(self, df, path, partition_column, mode, database, table):
 
         self.logger.info("Starting write_parquet")
         self.logger.info("database.table => {}.{}".format(database, table))
@@ -34,9 +34,6 @@ class SparkUtils:
             write_obj = write_obj.partitionBy(partition_column)
 
         write_obj.saveAsTable(table)
-
-        if len(list_path_delete) > 0:
-            self.s3.delete_file_s3(path=list_path_delete, path_or_key="key")
 
         self.spark.catalog.refreshTable("{}.{}".format(database, table))
 
