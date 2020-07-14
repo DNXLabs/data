@@ -7,9 +7,9 @@ mysql_vs_pandas = {
     "int": "int",
     "timestamp": "datetime64",
     "tinyint": "int",
+    "smallint": "int",
     "varchar": "str"
 }
-
 
 mysql_vs_spark = {
     "bigint": "integer",
@@ -18,5 +18,6 @@ mysql_vs_spark = {
     "int": "integer",
     "timestamp": "timestamp",
     "tinyint": "integer",
+    "smallint": "integer",
     "varchar": "string"
 }

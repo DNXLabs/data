@@ -108,7 +108,7 @@ class Pandas:
 
     def convert_dtypes(self, df, list_dtypes):
 
-        self.logger.debug("Starting fix_dtypes")
+        self.logger.debug("Starting convert_dtypes")
         self.logger.debug("list_dtypes {}".format(list_dtypes))
 
         columns = []
@@ -116,7 +116,7 @@ class Pandas:
             columns.append(col)
 
         for column in columns:
-            dtype = list_dtypes.get(column)
+            dtype = list_dtypes.get(column, None)
 
             if dtype is None:
                 self.logger.warning(
@@ -128,10 +128,11 @@ class Pandas:
                 )
                 continue
 
+            df[column] = df[column].str.strip()
             if dtype in ["int", "bigint"]:
                 df[column] = pd.to_numeric(df[column], errors='coerce')
                 df = df.replace(np.nan, 0, regex=True)
-                df[column] = df[column].astype('float').astype('int')
+                df[column] = df[column].astype('float').astype('Int32')
             elif dtype == "datetime64":
                 df[column] = pd.to_datetime(df[column])
             elif dtype == "str":
@@ -140,6 +141,6 @@ class Pandas:
                 df[column] = df[column].astype('bool')
 
         self.print_dtypes(df)
-        self.logger.debug("Finishing fix_dtypes")
+        self.logger.debug("Finishing convert_dtypes")
 
         return df
