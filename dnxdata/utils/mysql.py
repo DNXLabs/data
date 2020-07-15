@@ -64,8 +64,9 @@ class Mysql:
         )
 
         primary = []
-        for x in result[0]:
-            primary.append(x)
+        if result:
+            for x in result[0]:
+                primary.append(x)
 
         self.logger.debug("Result {}".format(primary))
 

@@ -222,11 +222,10 @@ class Dynamo:
 
     def check_response(self, response):
 
-        v_success = True
         if response["ResponseMetadata"]["HTTPStatusCode"] == 200:
             self.logger.debug("Successful")
         else:
             self.logger.error("Response {}".format(response))
-            v_success = False
+            return False
 
-        return v_success
+        return True
