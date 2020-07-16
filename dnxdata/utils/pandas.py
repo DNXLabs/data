@@ -8,8 +8,7 @@ import numpy as np
 
 class Pandas:
 
-    def __init__(self, region=None):
-        self.region = region
+    def __init__(self):
         self.utils = Utils()
         self.s3 = S3()
         self.logger = Logger("DNX Pandas =>")
@@ -17,7 +16,8 @@ class Pandas:
     # You can pass list or string path or .parquet
     def get_parquet(self, path):
 
-        self.logger.debug("Starting get_parquet {}".format(path))
+        self.logger.debug("Starting get_parquet")
+        self.logger.debug("{}".format(path))
 
         keys_s3 = self.s3.get_list_parquet(path)
         self.logger.debug("S3keys {}".format(keys_s3))
@@ -37,7 +37,7 @@ class Pandas:
 
     def write_parquet(self, df, path, database, table, mode, partition_cols, list_path_delete):
 
-        self.logger.debug("Starting Write Parquet")
+        self.logger.debug("Starting write_parquet")
 
         if (list_path_delete is not None) & (mode != "append"):
             self.logger.debug(
@@ -79,7 +79,7 @@ class Pandas:
                     compression='snappy'
                 )
 
-        self.logger.debug("Finishing Write Parquet")
+        self.logger.debug("Finishing write_parquet")
 
     def print_dtypes(self, df):
 
