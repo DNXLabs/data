@@ -38,6 +38,14 @@ class Json:
         except Exception as e:
             self.logger.error("Error load_json: {} ".format(e))
 
+    def global_json(self, key=None):
+
+        if key is None:
+            return self.load_json(key="global")
+        else:
+            self.logger.debug("parameter {}".format(key))
+            return self.load_json(key="global", value=key)
+
     def valid_key(self, key, value=None, table=None):
 
         self.logger.debug(

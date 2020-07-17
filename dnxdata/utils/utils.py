@@ -1,5 +1,6 @@
 import dateutil.tz
-from datetime import datetime
+from datetime import datetime, timedelta
+import time
 from dnxdata.logger import Logger
 from dnxdata.utils.constants import TIMESTAMP
 
@@ -84,3 +85,11 @@ class Utils:
         seconds = (dt_current - dt_before).total_seconds()
 
         return seconds
+
+    def convert_timestamp_epoch(self, add_days):
+
+        dt_now = datetime.strptime(self.date_time(), TIMESTAMP)
+        dt_new = dt_now + timedelta(days=int(add_days))
+        dt_convert = int(time.mktime (dt_new.timetuple()))
+
+        return dt_convert

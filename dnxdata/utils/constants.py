@@ -1,2 +1,2 @@
 
-TIMESTAMP = "%Y-%m-%d %H:%M:%S"
+TIMESTAMP = '%Y-%m-%d %H:%M:%S'
