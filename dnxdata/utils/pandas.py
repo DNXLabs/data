@@ -144,3 +144,26 @@ class Pandas:
         self.logger.debug("Finishing convert_dtypes")
 
         return df
+
+    def create_database_athena(self, database):
+
+        if database not in wr.catalog.databases().values:
+            wr.catalog.create_database(database)
+            self.logger.debug(
+                "Database {} created in Data Lake"
+                .format(
+                    database
+                )
+            )
+
+    def delete_table_athena(self, database, table):
+
+        self.logger.debug("Starting delete_table_athena")
+        self.logger.debug("database {} table {}".format(database, table))
+
+        wr.catalog.delete_table_if_exists(
+            database=database,
+            table=table
+        )
+
+        self.logger.debug("Finishing delete_table_athena")
