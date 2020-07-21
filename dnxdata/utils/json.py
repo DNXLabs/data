@@ -80,7 +80,13 @@ class Json:
         database = database.lower()
 
         self.logger.debug("Starting get_config")
-        self.logger.debug("database {} table {}".format(database, table))
+        self.logger.debug(
+            "database {} table {}"
+            .format(
+                database.upper(),
+                table.upper()
+            )
+        )
 
         config = {}
 
