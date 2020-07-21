@@ -1,7 +1,11 @@
 import boto3
 import os
 
-AWS_REGION = os.getenv("AWS_REGION", None)
+
+_session = boto3.session.Session()
+region_name = _session.region_name
+
+AWS_REGION = os.getenv("AWS_REGION", region_name)
 
 # S3
 s3_client = boto3.client('s3', region_name=AWS_REGION)
