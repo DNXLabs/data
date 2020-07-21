@@ -17,23 +17,32 @@ class SparkUtils:
     def write_parquet(self, df, path, partition_column, mode, database, table):
 
         self.logger.info("Starting write_parquet")
-        self.logger.info("database.table => {}.{}".format(database, table))
+        dbtable = "{}.{}".format(database, table)
+        self.logger.info("database.table => {}".format(dbtable))
 
         self.is_empty_df(df=df, exit_none=True)
 
         self.spark.catalog.setCurrentDatabase(database)
 
-        write_obj = df.write. \
-            format("parquet"). \
-            option("path", path). \
-            option("mergeSchema", "true"). \
-            option("compression", "snappy"). \
-            mode(mode.replace("merge", "append"))
-
         if len(partition_column) > 0:
-            write_obj = write_obj.partitionBy(partition_column)
 
-        write_obj.saveAsTable(table)
+            df.write. \
+                format("hive"). \
+                partitionBy(partition_column). \
+                saveAsTable(
+                        dbtable,
+                        mode=mode,
+                        path=path
+                )
+        else:
+
+            df.write. \
+                format("hive"). \
+                saveAsTable(
+                        dbtable,
+                        mode=mode,
+                        path=path
+                )
 
         self.spark.catalog.refreshTable("{}.{}".format(database, table))
 
