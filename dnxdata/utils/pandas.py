@@ -128,7 +128,6 @@ class Pandas:
                 )
                 continue
 
-            df[column] = df[column].str.strip()
             if dtype in ["int", "bigint"]:
                 df[column] = pd.to_numeric(df[column], errors='coerce')
                 df = df.replace(np.nan, 0, regex=True)
