@@ -35,27 +35,22 @@ class Pandas:
 
         return df
 
-    def write_parquet(self, df, path, database, table, mode, partition_cols, list_path_delete):
+    def write_parquet(self, df, path, database, table, mode, partition_cols):
 
         self.logger.debug("Starting write_parquet")
-
-        if (list_path_delete is not None) & (mode != "append"):
-            self.logger.debug(
-                "list_path_delete => {}"
-                .format(list_path_delete)
+        self.logger.debug("database.table {}.{}".format(database, table))
+        self.logger.debug(
+            "mode {} partition_cols {} path {}"
+            .format(
+                mode,
+                partition_cols,
+                path
             )
-            self.s3.delete_file_s3(
-                path=list_path_delete,
-                path_or_key="key"
-            )
+        )
 
         if df.empty:
-            self.logger.debug(
-                "DF is None or DF have to only lines with delete"
-            )
+            self.logger.debug("DataFrame is None")
         else:
-            df["dt_process_parq"] = self.utils.date_time()
-            df["dt_process_parq"] = pd.to_datetime(df["dt_process_parq"])
 
             if partition_cols:
                 wr.s3.to_parquet(
