@@ -27,7 +27,7 @@ class SparkUtils:
         if len(partition_column) > 0:
 
             df.write. \
-                format("hive"). \
+                format("parquet"). \
                 partitionBy(partition_column). \
                 saveAsTable(
                         dbtable,
@@ -37,7 +37,7 @@ class SparkUtils:
         else:
 
             df.write. \
-                format("hive"). \
+                format("parquet"). \
                 saveAsTable(
                         dbtable,
                         mode=mode,
