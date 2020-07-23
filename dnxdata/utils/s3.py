@@ -21,12 +21,11 @@ class S3:
 
         if format_file is not None:
             if format_file.lower() == "gz":
-                bytestream = BytesIO(file['Body'].read())
-                decoded = gzip.GzipFile(
-                    None,
-                    'rb',
-                    fileobj=bytestream
-                ).read().decode('utf-8')
+                _file = file['Body'].read()
+                gzipfile = BytesIO(_file)
+                decoded = gzip.decompress(
+                    gzipfile.read()
+                ).decode('utf-8')
         else:
             file = file['Body'].read()
             decoded = file.decode('utf-8')
@@ -35,23 +34,24 @@ class S3:
 
         return decoded
 
-    def put_object_s3(self, bucket, key, file):
+    def put_object_s3(self, bucket, key, file, format_file):
 
         self.logger.debug("Starting put_object_s3")
         self.logger.debug("Target {}/{}".format(bucket, key))
 
-        gz_body = BytesIO()
-        gz = gzip.GzipFile(None, 'wb', 9, gz_body)
-        gz.write(str(file).encode('utf-8'))  # convert unicode strings to bytes
-        gz.close()
-        # GzipFile has written the compressed bytes into our gz_body
-        s3_client.put_object(
-            Bucket=bucket,
-            Key=key,  # Note: NO .gz extension!
-            ContentType='text/plain',  # the original type
-            ContentEncoding='gzip',  # MUST have or browsers will error
-            Body=gz_body.getvalue()
-        )
+        if format_file.lower() == "gz":
+
+            gz_body = BytesIO()
+            gz = gzip.GzipFile(None, 'wb', 9, gz_body)
+            # convert unicode strings to bytes
+            gz.write(str(file).encode('utf-8'))
+            gz.close()
+
+            s3_client.put_object(
+                Bucket=bucket,
+                Body=gz_body.getvalue(),
+                Key=key
+            )
 
         self.logger.debug("Finishing put_object_s3")
 
