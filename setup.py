@@ -5,13 +5,14 @@ with open("README.md", "r") as fh:
 
 
 install_requires = [
-    'dnx-mysql-replication==0.21'
+    'dnx-mysql-replication==0.21.2',
+    'pymysql==0.9.3'
     # 'awswrangler-git @ https://github.com/awslabs/aws-data-wrangler/releases/download/1.5.0/awswrangler-layer-1.5.0-py3.8.zip#egg=awswrangler-git-1.5.0'
 ]
 
 setuptools.setup(
     name='dnx-data',  # Replace with your own username
-    version='0.4.0',
+    version='0.4.1',
     author='DNX Solutions',
     author_email='contact@dnx.solutions',
     description='DNX data solution package',
