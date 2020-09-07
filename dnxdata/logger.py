@@ -6,7 +6,9 @@ class Logger:
 
     def __init__(self, header):
         self.header = str(header)
-        logging.basicConfig()
+        logging.basicConfig(
+            format='%(asctime)s,%(msecs)d %(levelname)-8s [%(filename)s:%(lineno)d] %(message)s',
+            datefmt='%Y-%m-%d:%H:%M:%S')
         self.logger = logging.getLogger(__name__)
         self.logger.setLevel(LOG_LEVEL)
 
