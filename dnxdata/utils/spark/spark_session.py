@@ -15,10 +15,10 @@ def _spark():
 
     spark = SparkSession \
         .builder.appName("Metrics-Transformer => - Data ETL Glue") \
-        .config("hive.exec.dynamic.partition", "true") \
-        .config("hive.exec.dynamic.partition.mode", "nonstrict") \
         .enableHiveSupport() \
         .getOrCreate()
+        # .config("hive.exec.dynamic.partition", "true") \
+        # .config("hive.exec.dynamic.partition.mode", "nonstrict") \
 
     sys.path.insert(0, SparkFiles.getRootDirectory())
 

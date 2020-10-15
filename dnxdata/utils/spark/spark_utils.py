@@ -1,5 +1,6 @@
 import sys
 from pyspark.sql.functions import (when, col, trim, lit)
+from pyspark.sql.utils import AnalysisException
 from dnxdata.utils.utils import Utils
 from dnxdata.utils.s3 import S3
 from dnxdata.logger import Logger
@@ -25,24 +26,35 @@ class SparkUtils:
         self.spark.catalog.setCurrentDatabase(database)
 
         if len(partition_column) > 0:
-
-            df.write. \
-                format("parquet"). \
-                partitionBy(partition_column). \
-                saveAsTable(
+            try:
+                df.write \
+                    .format("parquet") \
+                    .partitionBy(partition_column) \
+                    .saveAsTable(
                         dbtable,
                         mode=mode,
                         path=path
-                )
+                    )
+            except AnalysisException as ae:
+                self.logger.info(ae)
+                pass
+            except Exception as e:
+                raise
         else:
-
-            df.write. \
-                format("parquet"). \
-                saveAsTable(
+            try:
+                df.write \
+                    .format("parquet") \
+                    .saveAsTable(
                         dbtable,
                         mode=mode,
                         path=path
-                )
+                    )
+            except AnalysisException as ae:
+                self.logger.info(ae)
+                pass
+            except Exception as e:
+                raise
+
 
         self.spark.catalog.refreshTable("{}.{}".format(database, table))
 
