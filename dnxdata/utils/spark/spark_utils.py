@@ -157,8 +157,8 @@ class SparkUtils:
                 "dbtable": connection_settings.get("dbtable"),
                 "user": connection_settings.get("user"),
                 "password": connection_settings.get("passwd"),
-                "customJdbcDriverS3Path": "s3://metrics-mysql-etl/mysql-connector-java-8.0.22.jar",
-                "customJdbcDriverClassName": "com.mysql.cj.jdbc.Driver"
+                "customJdbcDriverS3Path": connection_settings.get("customJdbcDriverS3Path"),
+                "customJdbcDriverClassName": connection_settings.get("customJdbcDriverClassName")
             }
 
             df = self.glue_context.create_dynamic_frame.from_options(
