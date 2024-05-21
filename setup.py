@@ -6,7 +6,7 @@ with open("README.md", "r") as fh:
 
 install_requires = [
     'dnx-mysql-replication==0.21.2',
-    'pymysql==0.9.3'
+    'pymysql==1.1.1'
     # 'awswrangler-git @ https://github.com/awslabs/aws-data-wrangler/releases/download/1.5.0/awswrangler-layer-1.5.0-py3.8.zip#egg=awswrangler-git-1.5.0'
 ]
 
